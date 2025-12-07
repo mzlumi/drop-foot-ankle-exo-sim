@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Data downloaded by scripts/fetch_data.py (never committed)
+data/raw/
+
+# SCONE optimization output (keep only curated .par files under results/)
+results/raw/
+*.sto.tmp
+
+# Build and report artifacts
+build/
+dist/
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.toc
+report/*.synctex.gz
+report/*.fdb_latexmk
+report/*.fls
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
