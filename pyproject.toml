@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dropfoot"
+version = "0.1.0"
+description = "Drop-foot gait and an IMU-triggered ankle exoskeleton in a SCONE reflex walking model"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Parmida Mazloomi" }]
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pandas>=2.1",
+    "matplotlib>=3.8",
+    # Companion repository (private): storage reader, ZML parser, gait cycles.
+    # Pinned so the readers never change under this project.
+    "scone-gait @ git+https://github.com/mzlumi/scone-pathological-gait@2d137a245daa4520f7525ed84d9c79cd93163749",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
