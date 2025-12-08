@@ -36,3 +36,6 @@ Thumbs.db
 .idea/
 *.swp
 *~
+
+# Temporary scenario and .par copies made by dropfoot.scone.evaluate
+scenarios/.eval_*

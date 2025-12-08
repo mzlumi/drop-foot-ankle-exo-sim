@@ -1,0 +1,4 @@
+data {
+	frequency = 200
+	muscle_dof = 1
+}

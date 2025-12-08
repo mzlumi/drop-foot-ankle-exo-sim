@@ -13,6 +13,8 @@ Every result in `results/` was produced with the software below. CMA-ES results 
 | Tutorial files | scone-core commit `8cc814822c58356e110027d80962ebf0f024e116` (fetched by `scripts/fetch_data.py scone`) |
 | Model | `Human0914.osim` (planar, 9 degrees of freedom, 7 muscles per leg) |
 | Control step | SCONE default, 1 ms (`fixed_control_step_size = 0.001`). A 5 ms step made the tutorial solution fall at 1.4 s and was not faster |
+| Data output | 200 Hz, with per-muscle joint moments and powers (`scenarios/settings/scone-settings.zml`, mounted as SCONE's settings file) |
+| Runner | `python scripts/run_scone.py` (`src/dropfoot/scone.py`), the same `docker run` call as the companion's `scripts/scone.sh` with this repository mounted at `/work` |
 
 ## Host
 
