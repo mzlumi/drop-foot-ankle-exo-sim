@@ -3,7 +3,7 @@
 -- logged with store_data. Applies no force.
 -- Properties (strings, from the ScriptController block):
 --   body (default tibia_r), rate_hz (100), noise_dps (0.5), bias_dps (2),
---   delay_s (0.015), seed (1), and the detector settings of detector.lua
+--   imu_delay_s (0.015), seed (1), and the detector settings of detector.lua
 --   (swing_dps, hs_feature, hs_depth_dps, hs_rise_dps, to_depth_dps,
 --   to_rise_dps, lockout_frac, terminal_timeout, stride0).
 
@@ -17,7 +17,7 @@ function init( model, par, side )
 		tonumber( scone.rate_hz ) or 100,
 		tonumber( scone.noise_dps ) or 0.5,
 		tonumber( scone.bias_dps ) or 2.0,
-		tonumber( scone.delay_s ) or 0.015,
+		tonumber( scone.imu_delay_s ) or 0.015,
 		tonumber( scone.seed ) or 1 )
 	detector = Detector.new( {
 		swing_dps = tonumber( scone.swing_dps ),

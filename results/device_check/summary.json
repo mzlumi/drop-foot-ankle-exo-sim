@@ -1,0 +1,29 @@
+{
+  "par": "data/raw/scone-tutorials/data/ResultGait10.par",
+  "pulse_nm": {
+    "none": 0.0,
+    "plus": 2.0,
+    "minus": -2.0
+  },
+  "on_s": 2.25,
+  "off_s": 2.3,
+  "none": {
+    "duration_s": 10.0,
+    "fell": false,
+    "cost": 6.29394
+  },
+  "plus": {
+    "duration_s": 10.0,
+    "fell": false,
+    "cost": 6.30628
+  },
+  "minus": {
+    "duration_s": 2.815,
+    "fell": true,
+    "cost": 85.601
+  },
+  "ankle_change_after_10ms_deg": {
+    "plus": 0.25567668649917846,
+    "minus": -0.2575960951128671
+  }
+}

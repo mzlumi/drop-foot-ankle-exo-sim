@@ -30,7 +30,7 @@ CmaOptimizer {
 				rate_hz = 100
 				noise_dps = 0.5
 				bias_dps = 2
-				delay_s = 0.015
+				imu_delay_s = 0.015
 				seed = 1
 			}
 		}
