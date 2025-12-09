@@ -1,5 +1,5 @@
 """The simulated gyroscope: Python twin against its definition, against the
-Lua module run directly, and against a SCONE run (tests/data/imu_tutorial_0-3s.sto)."""
+Lua module run directly, and against a SCONE run (tests/data/imu_tutorial_0-6s.sto)."""
 
 import shutil
 import subprocess
@@ -81,7 +81,7 @@ def test_scone_run_matches_python_twin():
     """In SCONE the frame at time t > 0 is written before the controller
     update at t, so logged controller state is one control step old (the
     first frame comes after the initial update at t = 0)."""
-    s = read_sto(DATA / "imu_tutorial_0-3s.sto")
+    s = read_sto(DATA / "imu_tutorial_0-6s.sto")
     col = lambda n: s.data[:, s.labels.index(n)]
     cfg = GyroConfig()  # the values in scenarios/healthy_imu.scone
     t = s.time
