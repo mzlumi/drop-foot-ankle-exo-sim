@@ -106,8 +106,10 @@ def prepare_evaluation(
 
 
 def evaluate_command(files: EvalFiles, overrides: dict[str, object] | None = None, root: Path = ROOT) -> list[str]:
+    # SCONE resolves the optimizer's init_file even when it only evaluates a .par
+    overrides = {"CmaOptimizer.use_init_file": 0, **(overrides or {})}
     args = ["-e", container_path(files.par, root), "-r", container_path(files.output, root)]
-    args += [f"{k}={v}" for k, v in (overrides or {}).items()]
+    args += [f"{k}={v}" for k, v in overrides.items()]
     return docker_prefix(None, root) + args
 
 

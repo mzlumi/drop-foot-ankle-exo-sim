@@ -44,7 +44,7 @@ def test_prepare_evaluation_puts_par_next_to_scenario_copy(tmp_path):
     assert files.par.with_suffix(".scone") == files.scenario
     assert files.scenario.read_text() == "CmaOptimizer {}"
     cmd = scone.evaluate_command(files, root=tmp_path)
-    assert cmd[-4:] == ["-e", "/work/scenarios/.eval_t.par", "-r", "/work/out/r.par"]
+    assert cmd[-5:] == ["-e", "/work/scenarios/.eval_t.par", "-r", "/work/out/r.par", "CmaOptimizer.use_init_file=0"]
     files.cleanup()
     assert not files.scenario.exists() and not files.par.exists()
 
