@@ -33,7 +33,9 @@ central differences.
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 
@@ -53,6 +55,21 @@ class Motor:
     @property
     def ke(self) -> float:
         return self.kt
+
+
+MOTOR_FILE = "actuator/motor_ec45flat_411812.toml"
+
+
+def load_motor(path: str | Path | None = None) -> tuple[Motor, dict]:
+    """The chosen motor from its parameter file, and the remaining entries
+    (inductance, gear efficiency) as a dict."""
+    import tomllib
+
+    from dropfoot import ROOT
+
+    raw = tomllib.loads(Path(path or ROOT / MOTOR_FILE).read_text())
+    fields = {f.name for f in dataclasses.fields(Motor)}
+    return Motor(**{k: v for k, v in raw.items() if k in fields}), {k: v for k, v in raw.items() if k not in fields}
 
 
 def periodic_derivative(y: np.ndarray, dt: float) -> np.ndarray:

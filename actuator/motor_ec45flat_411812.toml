@@ -1,0 +1,14 @@
+# maxon EC 45 flat, 70 W, 24 V, part 411812.
+# Datasheet values from https://www.maxongroup.com/maxon/view/product/motor/ecmotor/ecflat/ecflat45/411812
+# (opened 2025-12-09). Values marked "assumed" are not on the datasheet; see actuator/MOTOR.md.
+name = "maxon EC 45 flat 70 W 24 V (411812)"
+kt = 0.0369              # N m/A, torque constant 36.9 mNm/A
+resistance = 0.608       # ohm, terminal resistance phase to phase
+inertia = 1.81e-5        # kg m^2, rotor inertia 181 g cm^2
+rated_current = 3.21     # A, nominal (max. continuous) current
+max_speed = 1047.2       # rad/s, max. speed 10000 rpm
+supply_voltage = 24.0    # V, nominal voltage
+inductance = 0.463e-3    # H, terminal inductance phase to phase
+peak_current = 15.0      # A, assumed: peak output of a maxon ESCON 50/5 controller
+damping = 1.35e-5        # N m s/rad, assumed: from no-load current 234 mA at 6110 rpm
+gear_efficiency = 0.85   # assumed

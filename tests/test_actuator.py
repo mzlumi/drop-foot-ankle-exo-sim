@@ -82,6 +82,16 @@ def test_limits_flag_speed():
     assert check_limits(operate(slow, 20.0, np.inf, t, tau, theta), slow).speed
 
 
+def test_chosen_motor_file_is_consistent():
+    from dropfoot.actuator import load_motor
+
+    motor, extra = load_motor()
+    assert motor.kt == pytest.approx(60 / (2 * np.pi * 259), rel=0.01)  # speed constant 259 rpm/V
+    no_load = (motor.supply_voltage - motor.resistance * 0.234) / motor.ke
+    assert no_load == pytest.approx(6110 * 2 * np.pi / 60, rel=0.015)
+    assert 0 < extra["gear_efficiency"] <= 1
+
+
 def test_torque_requirement_keeps_dorsiflexing_deficit():
     healthy = np.array([0.0, 5.0, 10.0, 2.0])
     weak = np.array([0.0, 1.25, 2.5, 3.0])
