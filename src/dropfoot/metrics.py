@@ -13,9 +13,9 @@ as mean and SD over strides. The definitions:
     joint, during **mid-swing**, taken as the middle half of swing (25 to 75%
     of the time from toe-off to the next heel strike). The window excludes the
     instants near toe-off and heel strike where the forefoot is at or near the
-    ground. The origin of ``toes`` sits above the ground even in stance (about
-    20 to 30 mm), so the number is a height of that point, not a gap between
-    the shoe and the floor.
+    ground. The origin of ``toes`` sits about 6 mm above the ground in stance,
+    so the number is the height of that point, not the gap between the sole
+    and the floor.
 
 ``ankle_at_ic_deg``
     Ankle angle at heel strike (initial contact), interpolated at the event
