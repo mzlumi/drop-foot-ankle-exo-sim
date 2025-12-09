@@ -99,14 +99,14 @@ def camargo(list_only: bool = False) -> None:
     target = RAW / "camargo"
     if not list_only:
         print(
-            "\nCamargo et al. 2021 dataset (manual, browser; CC BY 4.0; about 1 GB per subject):\n"
+            "\nCamargo et al. 2021 dataset (CC BY 4.0):\n"
             f"  Project page: {CAMARGO_PAGE}\n"
             f"  Dropbox mirror: {CAMARGO_DROPBOX}\n"
             "  Mendeley Data: " + ", ".join(CAMARGO_MENDELEY) + "\n"
-            "  1. Download SubjectInfo.mat and one subject folder at a time (for example AB06).\n"
-            f"  2. Unzip into {target.relative_to(ROOT)}/ so you get SubjectInfo.mat and AB06/...\n"
-            "  3. Start with three to five subjects; the project does not need all 22.\n"
-            "  4. Confirm the shank gyroscope channel name and sign, and write them in data/README.md."
+            "  The files this project needs are extracted from the Mendeley zips by:\n"
+            "    python scripts/fetch_camargo.py conditions\n"
+            "    python scripts/fetch_camargo.py trials --speed 1.2\n"
+            f"  into {target.relative_to(ROOT)}/ (see data/README.md, section 3)."
         )
     if not target.exists():
         print(f"\n  {target.relative_to(ROOT)}/ does not exist yet.")

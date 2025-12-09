@@ -10,7 +10,7 @@ All pages below were opened on 2025-12-07 to confirm what they contain.
 |---|---|---|---|---|
 | SCONE application | Running and optimizing the reflex walking model | Apache-2.0 (scone-core), GPL-3.0 (scone-studio GUI) | 23 to 49 MB installer | No: browser download from SimTK |
 | SCONE tutorial scenarios and models (`Human0914`) | Starting scenarios, controller, measures, initial states and optimized parameters | Apache-2.0 (in scone-core) | under 0.5 MB | Yes |
-| Camargo et al. (2021) dataset | Normative level-walking kinematics and kinetics; real shank IMU signals for the sim-to-real test of the event detector | CC BY 4.0 | about 1 GB per subject, 22 subjects | No: browser download (Dropbox or Mendeley Data) |
+| Camargo et al. (2021) dataset | Normative level-walking kinematics and kinetics; real shank IMU signals for the sim-to-real test of the event detector | CC BY 4.0 | about 1 GB per subject, 22 subjects; this project needs about 0.6 GB | Yes: single files from the Mendeley zips (`scripts/fetch_camargo.py`) |
 | Motor datasheet | Motor constants for the actuator sizing | Manufacturer's terms | one PDF | No: chosen by hand |
 
 ## 1. SCONE
@@ -66,17 +66,31 @@ The installed SCONE app also ships the tutorials. If its copy differs from the p
 - Citation: J. Camargo, A. Ramanathan, W. Flanagan and A. Young, "A comprehensive, open-source dataset of lower limb biomechanics in multiple conditions of stairs, ramps, and level-ground ambulation and transitions," *Journal of Biomechanics* 119, 110320, 2021. <https://doi.org/10.1016/j.jbiomech.2021.110320>
 - Size: the project page says about 1 GB per subject and recommends downloading subjects one at a time.
 
-**Checked: are raw shank IMU signals included?** Yes. The project page states that the IMUs on the trunk, thigh, shank and foot record 3-axis acceleration and gyroscope data, and the author's tutorial reads an `imu` table with channels such as `thigh_Gyro_Z`. There is no magnetometer. The exact shank channel name (expected `shank_Gyro_Z`) and its sign convention must be confirmed on the first downloaded subject and written here.
+**Checked: are raw shank IMU signals included?** Yes. IMUs on the trunk, thigh, shank and foot record 3-axis acceleration and gyroscope data at 200 Hz; there is no magnetometer. The sagittal shank channel is `shank_Gyro_Y` (not `_Z`), in rad/s: its amplitude matches the shank angular velocity from inverse kinematics (the time derivative of `pelvis_tilt + hip_flexion_r + knee_angle_r`) with a ratio of 0.95 to 1.10, while X and Z reach 0.1 to 0.8. **Its sign and synchronization differ between subjects.** In the 1.2 m/s trials it correlates with the IK shank velocity at r = +0.98 in AB06 and AB16 (the sign of SCONE's `tibia_r.ang_vel_z`, positive when the shank rotates forward), at r between -0.93 and -0.98 in 18 subjects (sensor mounted the other way round), and it matches nowhere within ±50 ms in AB10 (best match 1.16 s away) and AB13. The best lag is about -2 ms in the two subjects with the positive sign and -12 to -20 ms in the others. `dropfoot.camargo.align_gyro` therefore calibrates sign and lag per subject against motion capture and rejects subjects with r below 0.9; the result is committed in `results/normative/camargo_treadmill_1.20mps_imu_alignment.csv`.
 
-**What the project needs.**
+**Format (confirmed on all 22 subjects, 2025-12-09).** Mendeley Data holds three zip files (Part 1: AB06 to AB14, 10.1 GB; Part 2: AB15 to AB24, 9.5 GB; Part 3: AB25 to AB30, 4.7 GB) plus `SubjectInfo.mat` (columns `Subject, Age, Gender, Height, Weight`; mass in kg). Inside the zips the layout is `<subject>/<date>/<mode>/<sensor>/<trial>.mat`, for example `AB06/10_09_18/treadmill/ik/treadmill_01_01.mat` (Part 3 writes `Treadmill_01_01`). Each `.mat` file holds one MATLAB `table` object, which `scipy.io.loadmat` cannot read; [`mat-io`](https://github.com/foreverallama/matio) (BSD-3-Clause) reads it into a pandas DataFrame. Every table has a `Header` column of time in seconds on a common clock. The tables used:
 
-- `SubjectInfo.mat` (subject mass and height, used to normalize moments).
-- For three to five subjects: the level-ground and treadmill trials, with the `ik`, `id`, `imu` and gait-cycle or force-plate data. Treadmill trials near 1.2 m/s give the normative curves for Part A; the shank gyroscope in the same trials is the real data for the sim-to-real test of the event detector.
-- The authors' MATLAB scripts (`STRIDES.m`, `PLOTS.m`, EpicToolbox) are useful as a reference for how strides are split, but the analysis here is written in Python.
+| Sensor | Columns used | Rate | Units and signs |
+|---|---|---|---|
+| `conditions` (variable `speed`) | `Header, Speed` | 1000 Hz | m/s. Each treadmill trial holds about 32 s plateaus at four or five speeds |
+| `ik` | `hip_flexion_r, knee_angle_r, ankle_angle_r, pelvis_tilt` | 200 Hz | degrees; knee negative in flexion, ankle positive in dorsiflexion (same as SCONE) |
+| `id` | `ankle_angle_r_moment` | 200 Hz | N m, not normalized; positive dorsiflexing |
+| `imu` | `shank_Gyro_Y` | 200 Hz | rad/s (accelerations in g) |
+| `fp` | `Treadmill_R_vy` | 1000 Hz | N, vertical force on the right belt |
+| `gcRight` | `HeelStrike, ToeOff` | 200 Hz | the dataset's gait phase in %, used only as a cross-check |
 
-The Dropbox listing is rendered with JavaScript, so the folder and file names could not be listed from a script; confirm them on the first download and write them here. The authors' tutorial works in MATLAB (`SubjectInfo.mat`, EpicToolbox for data tables), so expect `.mat` files. If they hold MATLAB table objects, `scipy.io.loadmat` may not read them; check this on the first subject. If they do not load, export the needed tables to CSV once in MATLAB (or Octave), keep the export script in `scripts/`, and keep the CSVs in `data/raw/`.
+Heel strike and toe-off are recomputed from `Treadmill_R_vy` at 5% of body weight, the definition used in the simulation. The belt force has short spikes of 3 to 5% body weight in swing, so it goes through a 25 ms running median and a debounce first (`dropfoot.camargo.force_events`). With that, the heel strikes are 5 to 10 ms earlier than the dataset's own (which uses a higher threshold) for all 22 subjects, and the toe-offs agree within 15 ms on median. One more observation: the inverse kinematics gives a peak stance dorsiflexion near 20 degrees, more than the usual 10 to 15, which suggests a constant offset of the dataset's foot calibration. The Part A comparison reports correlation and RMSE both with and without the mean offset.
 
-**How to download.** A browser is needed. The project page describes the Dropbox mirror as a public-view directory, so no account should be required (not tested with a full download). Open the Dropbox link, download `SubjectInfo.mat` and one subject folder at a time (for example `AB06`), and unzip into `data/raw/camargo/` so that you get `data/raw/camargo/SubjectInfo.mat` and `data/raw/camargo/AB06/...`. Running `python scripts/fetch_data.py camargo` prints these steps and then lists what it finds in that folder.
+**What the project needs and downloads.** `SubjectInfo.mat`, every treadmill `conditions` file (158 files, 80 MB), and for each of the 22 subjects the one treadmill trial that holds a 1.2 m/s plateau: `ik`, `id`, `imu`, `fp`, `gcRight` and `gcLeft` (about 21 MB per subject). The authors' MATLAB scripts (`STRIDES.m`, `PLOTS.m`, EpicToolbox) were not used; the analysis is written in Python.
+
+**How to download.** The Mendeley file URLs redirect to S3, which answers HTTP range requests, so [`scripts/fetch_camargo.py`](../scripts/fetch_camargo.py) reads each zip's central directory remotely and extracts single members without downloading the archives:
+
+```
+python scripts/fetch_camargo.py conditions          # about 40 s
+python scripts/fetch_camargo.py trials --speed 1.2  # about 5 min, 0.5 GB
+```
+
+Files land in `data/raw/camargo/` with the archive layout, and `data/raw/camargo/selected_trials_1.20.csv` records the trial chosen per subject. A browser download of whole subjects from the Dropbox mirror or Mendeley gives the same layout.
 
 ## 4. Normative gait curves
 

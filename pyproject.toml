@@ -14,6 +14,8 @@ dependencies = [
     "scipy>=1.11",
     "pandas>=2.1",
     "matplotlib>=3.8",
+    # Reads the MATLAB table objects of the Camargo et al. (2021) dataset (BSD-3-Clause).
+    "mat-io>=1.0",
     # Companion repository (private): storage reader, ZML parser, gait cycles.
     # Pinned so the readers never change under this project.
     "scone-gait @ git+https://github.com/mzlumi/scone-pathological-gait@2d137a245daa4520f7525ed84d9c79cd93163749",

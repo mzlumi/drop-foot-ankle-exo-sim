@@ -1,0 +1,22 @@
+{
+  "speed_mps": 1.2,
+  "subjects": 22,
+  "subjects_per_variable": {
+    "hip_flexion": 22,
+    "knee_flexion": 22,
+    "ankle_angle": 22,
+    "ankle_moment": 22,
+    "vertical_grf": 22,
+    "shank_gyro": 20
+  },
+  "strides_total": 568,
+  "strides_per_subject_min": 24,
+  "strides_per_subject_max": 29,
+  "stance_pct_mean": 60.27,
+  "stance_pct_sd": 1.01,
+  "imu_rejected": [
+    "AB10",
+    "AB13"
+  ],
+  "source": "Camargo et al. (2021), doi:10.1016/j.jbiomech.2021.110320, CC BY 4.0"
+}

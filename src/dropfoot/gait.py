@@ -115,6 +115,34 @@ def contact_events(
     return hs, to
 
 
+def merge_contacts(
+    hs: np.ndarray, to: np.ndarray, min_gap: float = 0.05, min_stance: float = 0.1
+) -> tuple[np.ndarray, np.ndarray]:
+    """Debounce raw crossings into contacts.
+
+    Measured forces chatter around the threshold near heel strike and toe-off.
+    Contacts separated by less than ``min_gap`` s are merged, and contacts
+    shorter than ``min_stance`` s are dropped. A contact that is already open
+    at the first sample, or still open at the last one, is dropped too.
+    """
+    hs, to = np.asarray(hs, float), np.asarray(to, float)
+    intervals = []
+    for a in hs:
+        after = to[to > a]
+        if len(after):
+            intervals.append([a, after[0]])
+    merged: list[list[float]] = []
+    for a, b in intervals:
+        if merged and a <= merged[-1][1]:
+            continue  # rising edge inside a contact that is already open
+        if merged and a - merged[-1][1] < min_gap:
+            merged[-1][1] = b
+        else:
+            merged.append([a, b])
+    kept = [(a, b) for a, b in merged if b - a >= min_stance]
+    return np.array([a for a, _ in kept]), np.array([b for _, b in kept])
+
+
 PERCENT = np.linspace(0.0, 100.0, 101)
 
 
