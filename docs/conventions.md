@@ -42,7 +42,11 @@ Pattern over one healthy stride, which the event detector relies on:
 2. a zero crossing just after toe-off, then a large **positive** peak in mid to late swing (about +400 deg/s) as the shank swings forward;
 3. a sharp drop when the knee reaches full extension at the end of swing (about 90% of the cycle), then a zero crossing and a **negative** minimum just after heel strike (about -260 deg/s within 5% of the cycle).
 
-A real shank IMU mounted on the lateral side of the right shank with its z axis pointing laterally reads the same sign. The Camargo et al. convention is checked separately in `data/README.md`.
+A real shank IMU mounted on the lateral side of the right shank with its z axis pointing laterally reads the same sign. In the Camargo et al. data the sign and the clock offset of `shank_Gyro_Y` differ between subjects; `dropfoot.camargo.align_gyro` calibrates both against motion capture (see `data/README.md`).
+
+The simulated gyroscope (`scenarios/lua/gyro.lua`, twin `dropfoot.sensor`) is in deg/s. Its channels in the `.sto` output are `imu.true`, `imu.measured` (held output), `imu.output_k` (index of the sample in the output), `imu.sample_true` and `imu.sample_k`.
+
+**Logging lag of script channels.** SCONE writes the output frame at time t (t > 0) before the controllers' update at t, so every value a script logs with `store_data` is the one from the previous control step (1 ms earlier). Model channels such as `tibia_r.ang_vel_z` are at time t. Analyses that compare script events with contact events subtract this step.
 
 ## Events and gait cycle
 
