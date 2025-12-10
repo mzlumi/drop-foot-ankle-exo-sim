@@ -74,6 +74,28 @@ All retrieved course documents are listed in [`docs/SOURCES.md`](docs/SOURCES.md
 
 Example hypothesis from the assignment: at 25% tibialis anterior strength, the active AFO restores minimum toe clearance to within 10 mm of healthy without reducing peak ankle push-off power, while the best passive AFO reduces push-off power by more than 15%.
 
+## Hypothesis
+
+Written and committed before any comparison between devices was run, and before the adapted drop-foot gaits were looked at. Any later change goes in a new commit that says why.
+
+**Hypothesis.** At 25% tibialis anterior strength, after the reflex controller has re-optimized with the device on, the phase-based active AFO brings minimum toe clearance in mid swing to within 10 mm of healthy without lowering peak ankle push-off power by more than 10% compared with drop foot without a device, while the best passive AFO lowers peak push-off power by more than 15%.
+
+**Primary metric.** Minimum toe clearance of the right (affected) foot in mid swing, in mm, as defined in `dropfoot.metrics` (height of the `toes_r` origin over the middle half of swing). Per run it is the mean over all strides after the two start-up strides; per condition it is the mean and SD over the 3 seeds. The healthy reference is the mean of the three healthy seeds (`results/healthy/summary.csv`).
+
+**Secondary metric used in the hypothesis.** Peak ankle push-off power: the peak positive power at the right ankle in stance, muscles plus device (`ankle_angle_r.power` plus the device's τ·θ̇), so that a device that resists push-off counts against itself.
+
+**Decision rule.** Three parts, all judged on the means over seeds:
+
+1. the active AFO's toe clearance is at least the healthy mean minus 10 mm;
+2. the active AFO's push-off power is at least 90% of the no-device value;
+3. the best passive AFO's push-off power is below 85% of the no-device value.
+
+The hypothesis is supported if all three hold, and rejected if any fails by more than one seed SD. A part that misses its threshold by less than the seed SD is reported as inconclusive. A condition with a fall in any seed counts as failing parts 1 and 2 for that device; falls are reported, never dropped.
+
+**How the devices are set up, decided now.** Both devices get the same treatment. The passive AFO's stiffness (neutral angle 0, k from 10 to 160 N m/rad, a factor of 2 apart) and the active AFO's swing target (0, 5 and 10 degrees of dorsiflexion, other gains set by the design calculation in the controller's commit) are each chosen on the frozen drop-foot controllers by one rule: among the settings with which all three seeds walk 10 s, take the one whose toe clearance is closest to healthy, and the lower setting on a tie. The chosen setting is then re-optimized with 3 seeds.
+
+**If 25% does not work.** If fewer than three adapted seeds walk at 25% strength, the experiment moves to the weakest tested level (50%) at which all three do, and the README says so.
+
 ## Data
 
 [`data/README.md`](data/README.md) describes every input and how to get it. In short:
