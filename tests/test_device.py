@@ -1,6 +1,5 @@
 """Device script: moment bookkeeping, actuator response, and the SCONE pulse test."""
 
-import math
 import shutil
 import subprocess
 from pathlib import Path
@@ -78,7 +77,10 @@ def test_scone_pulse_response_is_mirrored_and_decays():
     dorsiflexion for + (the sign convention), with an initial acceleration of the
     order of tau over the foot's inertia about the ankle."""
     s = read_sto(DATA / "device_pulse.sto")
-    col = lambda n: s.data[:, s.labels.index(n)]
+
+    def col(n):
+        return s.data[:, s.labels.index(n)]
+
     t = s.time
     dp = col("ankle_plus") - col("ankle_none")
     dm = col("ankle_minus") - col("ankle_none")

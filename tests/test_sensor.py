@@ -82,7 +82,10 @@ def test_scone_run_matches_python_twin():
     update at t, so logged controller state is one control step old (the
     first frame comes after the initial update at t = 0)."""
     s = read_sto(DATA / "imu_tutorial_0-6s.sto")
-    col = lambda n: s.data[:, s.labels.index(n)]
+
+    def col(n):
+        return s.data[:, s.labels.index(n)]
+
     cfg = GyroConfig()  # the values in scenarios/healthy_imu.scone
     t = s.time
     sample_k = col("imu.sample_k").astype(int)

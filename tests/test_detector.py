@@ -141,7 +141,10 @@ def test_scone_run_gives_the_python_events():
     """The detector inside SCONE (scenarios/healthy_imu.scone) and the twin
     on the logged samples find the same events."""
     s = read_sto(DATA / "imu_tutorial_0-6s.sto")
-    col = lambda n: s.data[:, s.labels.index(n)]
+
+    def col(n):
+        return s.data[:, s.labels.index(n)]
+
     k = col("imu.output_k").astype(int)
     first = np.flatnonzero(np.r_[True, np.diff(k) != 0] & (k >= 0))
     delay = 0.015

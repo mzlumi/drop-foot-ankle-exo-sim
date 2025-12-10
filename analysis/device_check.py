@@ -46,7 +46,10 @@ def main(argv: list[str]) -> int:
     t = runs["none"].time
     keep = (t >= 2.2 - 1e-9) & (t <= 2.6 + 1e-9)
     n = keep.sum()
-    col = lambda s, name: s.data[:, s.labels.index(name)]
+
+    def col(s, name):
+        return s.data[:, s.labels.index(name)]
+
     data = [col(runs[k], "ankle_angle_r")[keep] if len(runs[k].time) >= len(t) else
             col(runs[k], "ankle_angle_r")[: len(runs[k].time)][keep[: len(runs[k].time)]] for k in CASES]
     data = [np.pad(d, (0, n - len(d)), constant_values=np.nan) for d in data]
