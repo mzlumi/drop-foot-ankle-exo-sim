@@ -1,0 +1,2 @@
+min
+# rule: no missed or false events, then lowest pooled HS MAE; min: clean=True, HS MAE 25.4 ms, zero: clean=True, HS MAE 50.6 ms

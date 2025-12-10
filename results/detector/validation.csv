@@ -1,0 +1,7 @@
+condition,seed,feature,duration_s,hs_n_true,hs_missed,hs_false,hs_error_mean_ms,hs_error_sd_ms,hs_error_mae_ms,hs_error_max_abs_ms,hs_latency_mean_ms,hs_latency_max_ms,to_n_true,to_missed,to_false,to_error_mean_ms,to_error_sd_ms,to_error_mae_ms,to_error_max_abs_ms,to_latency_mean_ms,to_latency_max_ms,phase_error_mean_pct,phase_error_rms_pct,lua_twin_max_diff_s
+healthy,1,min,60,42,0,0,25.16,2.868,25.16,30.56,38.01,43.07,43,0,0,-12.52,2.932,12.52,17.99,10.51,15.51,-1.504,2.371,3.553e-15
+healthy,1,zero,60,42,0,0,-50.57,1.57,50.57,52.57,-45.56,-39.44,43,0,0,-12.52,2.932,12.52,17.99,10.51,15.51,4.049,4.413,
+healthy,2,min,60,43,0,0,25.39,2.979,25.39,29.96,37.72,42.99,43,0,0,-13.42,3.095,13.42,18.36,9.605,14.43,-1.534,2.398,7.105e-15
+healthy,2,zero,60,43,0,0,-50.66,1.632,50.66,52.79,-45.77,-40.04,43,0,0,-13.42,3.095,13.42,18.36,9.605,14.43,4.059,4.411,
+healthy,3,min,60,42,0,0,25.71,2.784,25.71,29.83,37.61,42.87,43,0,0,-13.03,3.027,13.03,18.48,9.757,15.05,-1.553,2.449,7.105e-15
+healthy,3,zero,60,42,0,0,-50.6,1.089,50.6,53.7,-45.48,-37.78,43,0,0,-13.03,3.027,13.03,18.48,9.757,15.05,4.05,4.438,
