@@ -1,5 +1,3 @@
-import dataclasses
-
 import numpy as np
 import pytest
 
@@ -56,6 +54,18 @@ def test_low_frequency_gain_is_one_and_bandwidth_is_found():
     assert abs(ph[0]) < 0.05
     bw = bandwidth(f, g)
     assert 5.0 < bw < 80.0
+
+
+def test_design_below_locked_resonance_is_refused():
+    with pytest.raises(ValueError):
+        design(SEA0, 0.9 * SEA0.locked_resonance_hz)
+
+
+def test_model_feedforward_has_no_notch_at_locked_resonance():
+    ctrl = design(SEA0, 15.0)
+    f = np.array([0.5, SEA0.locked_resonance_hz, 2 * SEA0.locked_resonance_hz])
+    g, _ = frequency_response(SEA0, ctrl, f)
+    assert np.all(np.abs(20 * np.log10(g)) < 1.0)
 
 
 def test_fit_recovers_known_lag():

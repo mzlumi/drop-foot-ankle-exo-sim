@@ -72,6 +72,21 @@ def load_motor(path: str | Path | None = None) -> tuple[Motor, dict]:
     return Motor(**{k: v for k, v in raw.items() if k in fields}), {k: v for k, v in raw.items() if k not in fields}
 
 
+def periodic_resample(percent: np.ndarray, y: np.ndarray, x: np.ndarray) -> np.ndarray:
+    """Periodic cubic spline through a gait-cycle curve on ``percent`` (0 to 100), evaluated at ``x`` (wrapped).
+
+    Linear interpolation would make the second derivative a train of impulses
+    at the 1% knots, which the inertial terms (and a feedforward on joint
+    acceleration) would then see as real. The end point is replaced by the
+    first so that the curve closes.
+    """
+    from scipy.interpolate import CubicSpline
+
+    yc = np.asarray(y, float).copy()
+    yc[-1] = yc[0]
+    return CubicSpline(percent, yc, bc_type="periodic")(np.mod(x, 100.0))
+
+
 def periodic_derivative(y: np.ndarray, dt: float) -> np.ndarray:
     """Central difference of a periodic signal sampled without the repeated end point."""
     return (np.roll(y, -1) - np.roll(y, 1)) / (2 * dt)

@@ -96,3 +96,16 @@ def test_torque_requirement_keeps_dorsiflexing_deficit():
     healthy = np.array([0.0, 5.0, 10.0, 2.0])
     weak = np.array([0.0, 1.25, 2.5, 3.0])
     np.testing.assert_allclose(torque_requirement(healthy, weak), [0.0, 4.5, 9.0, 0.0])
+
+
+def test_periodic_resample_is_smooth_and_closes():
+    from dropfoot.actuator import periodic_resample
+
+    pct = np.linspace(0, 100, 101)
+    y = np.sin(2 * np.pi * pct / 100)
+    x = np.linspace(0, 200, 801)
+    out = periodic_resample(pct, y, x)
+    np.testing.assert_allclose(out, np.sin(2 * np.pi * x / 100), atol=1e-6)
+    acc = np.diff(out, 2)
+    # second difference of a sine stays sinusoidal (no impulses at the knots)
+    assert np.max(np.abs(acc)) < 1.01 * (2 * np.pi * 0.25 / 100) ** 2

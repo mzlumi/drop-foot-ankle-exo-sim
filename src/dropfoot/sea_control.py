@@ -24,13 +24,17 @@ where ``tau_f`` is the measured torque through a first-order filter of
 The feedforward is the static term ``tau_d`` plus, optionally, the model
 term ``J_r a_ff + b_r w_ff`` that moves the gearbox output with the joint and
 the spring deflection: ``w_ff = theta_j' + tau_d'/k``, ``a_ff = theta_j'' +
-tau_d''/k``. The integral stops when the current command is clipped
-(anti-windup).
+tau_d''/k``, plus ``Kd d(tau_d,f)/dt`` with the reference through the same
+filter as the measurement. Without that last term the derivative on
+measurement still acts when tracking is perfect; at the lightly damped locked
+resonance it then dominates and the loop gain drops by about 15 dB. The
+integral stops when the current command is clipped (anti-windup).
 
 Gains come from pole placement on the locked-output plant
 ``J_r s^2 + (b_r + Kd k) s + k (1 + Kp)``: natural frequency
 ``2 pi bandwidth_hz`` and damping ``zeta``, with the integral zero a factor
-``ki_ratio`` below it. The resulting closed-loop bandwidth is measured, not
+``ki_ratio`` below it. This needs ``bandwidth_hz`` above the locked
+resonance (otherwise Kp would be negative; :func:`design` raises). The resulting closed-loop bandwidth is measured, not
 assumed, from simulated small-signal sine responses (:func:`frequency_response`).
 """
 
@@ -83,8 +87,10 @@ class Controller:
 
 def design(sea: SEA, bandwidth_hz: float, zeta: float = 0.7, ki_ratio: float = 5.0, **kw) -> Controller:
     """PID gains by pole placement on the locked-output plant (see the module docstring)."""
+    if bandwidth_hz <= sea.locked_resonance_hz:
+        raise ValueError(f"design frequency {bandwidth_hz} Hz is not above the locked resonance {sea.locked_resonance_hz:.1f} Hz")
     w = 2 * np.pi * bandwidth_hz
-    kp = max(sea.j_r * w**2 / sea.stiffness - 1.0, 0.0)
+    kp = sea.j_r * w**2 / sea.stiffness - 1.0
     kd = max((2 * zeta * w * sea.j_r - sea.b_r) / sea.stiffness, 0.0)
     ki = (1.0 + kp) * w / ki_ratio
     return Controller(kp=kp, ki=ki, kd=kd, **kw)
@@ -148,6 +154,7 @@ def simulate(
     i_int = 0.0
     e_int = 0.0
     tau_f = k * (theta - theta_j[0])
+    ref_f = tau_d[0]
     i_cmd_next = i_cmd = 0.0
     out = {name: np.empty(n) for name in ("tau", "cur", "volt", "om", "iclip", "vclip")}
     for j in range(n):
@@ -155,10 +162,13 @@ def simulate(
         # torque controller at the sample
         tau_f_prev = tau_f
         tau_f = tau_f + alpha_f * (tau - tau_f)
+        ref_f_prev = ref_f
+        ref_f = ref_f + alpha_f * (tau_d[j] - ref_f)
         e = tau_d[j] - tau
         ff = tau_d[j]
         if ctrl.model_feedforward:
             ff += jr * (alpha_j[j] + ddtau[j] / k) + br * (omega_j[j] + dtau[j] / k)
+            ff += ctrl.kd * (ref_f - ref_f_prev) / T
         u = ff + ctrl.kp * e + ctrl.ki * e_int - ctrl.kd * (tau_f - tau_f_prev) / T
         raw = u / ka
         cmd = float(np.clip(raw, -i_peak, i_peak))
@@ -198,19 +208,26 @@ def simulate(
 
 
 def frequency_response(
-    sea: SEA, ctrl: Controller, freqs_hz: np.ndarray, amplitude: float = 0.5, cycles: int = 12, settle: int = 6
+    sea: SEA,
+    ctrl: Controller,
+    freqs_hz: np.ndarray,
+    amplitude: float = 0.5,
+    cycles: int = 12,
+    settle: int = 6,
+    saturate: bool = False,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Closed-loop gain and phase (rad) from tau_d to tau with the output locked.
 
-    Each frequency is simulated without saturation; gain and phase come from
-    projecting the last ``cycles - settle`` periods on sine and cosine.
+    Each frequency is simulated (without saturation by default, the
+    small-signal response); gain and phase come from projecting the last
+    ``cycles - settle`` periods on sine and cosine.
     """
     gains, phases = [], []
     for f in freqs_hz:
         dur = max(cycles / f, 0.2)
         t = np.arange(0.0, dur, ctrl.period)
         ref = amplitude * np.sin(2 * np.pi * f * t)
-        tr = simulate(sea, ctrl, t, ref, saturate=False)
+        tr = simulate(sea, ctrl, t, ref, saturate=saturate)
         keep = t >= dur * settle / cycles
         s, c = np.sin(2 * np.pi * f * t[keep]), np.cos(2 * np.pi * f * t[keep])
         a = 2 * np.mean(tr.tau[keep] * s)
