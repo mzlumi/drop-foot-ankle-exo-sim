@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from dropfoot.fsm import FSMConfig
 from dropfoot.gait import Stride
@@ -117,3 +118,37 @@ def device_metrics(sto: Storage, strides: list[Stride]) -> dict[str, float]:
     if not rows:
         return {}
     return {k: float(np.mean([r[k] for r in rows])) for k in rows[0]}
+
+
+def judge(value: float, threshold: float, sd: float, above: bool) -> str:
+    """``value >= threshold`` (``above``) or ``value < threshold``; a miss smaller than ``sd`` is inconclusive."""
+    holds = value >= threshold if above else value < threshold
+    if holds:
+        return "holds"
+    return "inconclusive" if abs(value - threshold) < sd else "fails"
+
+
+def select_setting(df: pd.DataFrame, device: str, healthy_toe: float, metric: str = "min_toe_clearance_mm") -> dict:
+    """Tuning rule of the hypothesis on frozen runs (columns device, setting, value, seed, walks, ``metric``).
+
+    Among the settings with the most seeds walking (all of them, normally),
+    the one whose mean ``metric`` over walking seeds is closest to
+    ``healthy_toe``, the lower ``value`` on a tie.
+    """
+    d = df[df.device == device]
+    g = d.groupby("value").agg(walking=("walks", "sum"), runs=("walks", "size")).reset_index()
+    g["toe"] = g.value.map(d[d.walks].groupby("value")[metric].mean())
+    g["distance_mm"] = (g.toe - healthy_toe).abs()
+    top = g.walking.max()
+    pool = g[g.walking == top].sort_values(["distance_mm", "value"])
+    best = pool.iloc[0]
+    return {
+        "device": device,
+        "value": float(best.value),
+        "setting": d[d.value == best.value].setting.iloc[0],
+        "all_seeds_walk": bool(top == g.runs.max()),
+        "seeds_walking": int(top),
+        "toe_clearance_mm": float(best.toe),
+        "distance_from_healthy_mm": float(best.distance_mm),
+        "candidates": g.to_dict(orient="records"),
+    }

@@ -43,3 +43,38 @@ def test_device_scenarios_carry_the_properties():
     text = device_scenario("t", "x", active_props(FSMConfig(), ActuatorFit(0.01, 0.02, 11.0)), factor=0.25)
     for key in ("mode = active", "act_delay_s = 0.01", "limit_nm = 11.0", "kp_nm_per_rad = 30.0", "imu_delay_s = 0.015"):
         assert key in text
+
+
+def test_judge_holds_fails_and_inconclusive():
+    from dropfoot.experiment import judge
+
+    assert judge(30.0, 26.0, 2.0, above=True) == "holds"
+    assert judge(25.0, 26.0, 2.0, above=True) == "inconclusive"
+    assert judge(20.0, 26.0, 2.0, above=True) == "fails"
+    assert judge(80.0, 85.0, 3.0, above=False) == "holds"
+    assert judge(86.0, 85.0, 3.0, above=False) == "inconclusive"
+    assert judge(85.0, 85.0, 3.0, above=False) == "inconclusive"
+    assert judge(95.0, 85.0, 3.0, above=False) == "fails"
+
+
+def test_select_setting_prefers_all_walking_then_closest_then_lower():
+    import pandas as pd
+
+    from dropfoot.experiment import select_setting
+
+    rows = []
+    # k10: all walk, 20 mm; k20: all walk, 40 mm; k40: all walk, 32 mm; k80: one falls, 36 mm
+    for value, toe, falls in ((10, 20.0, 0), (20, 40.0, 0), (40, 32.0, 0), (80, 36.0, 1)):
+        for s in (1, 2, 3):
+            walks = s > falls
+            rows.append({"device": "passive", "setting": f"k{value}", "value": value, "seed": s, "walks": walks,
+                         "min_toe_clearance_mm": toe if walks else float("nan")})
+    df = pd.DataFrame(rows)
+    sel = select_setting(df, "passive", healthy_toe=36.0)
+    # k20 and k40 are both 4 mm from healthy: the lower one wins; k80 is closer but a seed falls
+    assert sel["setting"] == "k20"
+    assert sel["all_seeds_walk"]
+    # no setting lets all seeds walk: the most seeds walking decides first
+    few = df.assign(walks=((df.value == 80) & (df.seed > 1)) | ((df.value == 10) & (df.seed == 3)))
+    sel = select_setting(few, "passive", healthy_toe=36.0)
+    assert sel["setting"] == "k80" and not sel["all_seeds_walk"] and sel["seeds_walking"] == 2

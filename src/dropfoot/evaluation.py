@@ -36,6 +36,18 @@ def evaluate_cached(
     return read_sto(sto_path), report.read_text()
 
 
+def evaluate_many(jobs: list[tuple], workers: int = 6) -> list[tuple[Storage, str]]:
+    """:func:`evaluate_cached` for each ``(scenario, par, name[, overrides])`` in parallel, results in order.
+
+    Each SCONE evaluation runs in its own container on its own temporary
+    scenario copy, so the threads only wait on subprocesses.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return list(pool.map(lambda job: evaluate_cached(*job), jobs))
+
+
 def summarize(sto: Storage, report: str, skip_first: int = 2) -> dict[str, float]:
     """Cost, fall flag and time, and the gait metrics of :func:`dropfoot.metrics.gait_summary`."""
     duration = float(sto.time[-1])
