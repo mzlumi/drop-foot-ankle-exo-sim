@@ -29,3 +29,39 @@ Feature choice: by the rule fixed in the script before the results were seen
 (no missed or false events, then the lower pooled HS mean absolute error), the
 controller uses `min` (`chosen_feature.txt`). The choice is revisited only
 with the drop-foot gait added, on simulated data, never on the Camargo data.
+
+## Sim to real: Camargo et al. (2021), 20 subjects at 1.2 m/s
+
+`python analysis/part_d_camargo.py`. The calibrated shank gyroscope of each
+subject (sign and clock offset against motion capture; AB10 and AB13 rejected
+by the calibration) at 100 Hz plus the simulation's 15 ms delay, with the
+detector settings tuned on the simulation and not changed. Scored on the
+1.2 m/s plateaus against the right belt force. Per-subject statistics in
+`camargo.csv` (no signals), pooled in `camargo_pooled.csv`, figure
+`figures/detector_sim_vs_real.png`.
+
+| HS feature | HS missed / false (of 536) | HS error (ms) | HS latency (ms) | TO missed / false (of 532) | TO error (ms) | TO latency (ms) |
+|---|---|---|---|---|---|---|
+| min | 1 / 1 | +12.4 +/- 20.6 | 29.7 | 5 / 5 | -40.8 +/- 26.1 | -14.0 |
+| zero | 1 / 1 | -31.9 +/- 10.8 | -27.0 | 6 / 6 | -40.8 +/- 26.1 | -13.9 |
+
+The detector transfers without retuning: 99.8% of heel strikes and 99% of
+toe-offs are found (the 5 missed toe-offs are all in AB09). What changes:
+
+* **Heel strike with `min` is bimodal on real data.** Most subjects have a
+  shallow notch at contact, as the model does, and the error is near 0 ms;
+  in AB06 and AB16 (the two subjects whose gyroscope axis has the opposite
+  sign, so probably mounted differently) there is no notch and the detector
+  waits for the impact minimum, +50 ms. Seven subjects mix both (SD above
+  15 ms). The `zero` feature has no such ambiguity and half the spread on
+  real data, while in simulation it was the other way round. The controller
+  keeps `min`, as decided on simulated data; the report discusses the
+  trade-off, and the delay robustness test (Part F5) covers a 50 ms later
+  heel strike.
+* **Toe-off is estimated earlier and with more spread** (-41 +/- 26 ms
+  against -13 +/- 3 ms): the pre-swing minimum of the real shank velocity
+  comes 15 to 65 ms before the belt force reaches 5% of body weight,
+  depending on the subject.
+* The simulated error distributions are narrow because all strides of one
+  model are nearly identical; between-subject variation is the dominant
+  source of error in the real data.
