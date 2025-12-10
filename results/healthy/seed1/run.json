@@ -1,0 +1,11 @@
+{
+  "run_id": "261006.070509.f0914m.GH2010v8.S12W.D10.I.R1",
+  "seed": 1,
+  "generations": 119,
+  "best_cost": 0.546,
+  "best_generation": 118,
+  "best_par": "0118_0.547_0.546.par",
+  "best_cost_window_start": 0.547,
+  "rel_improvement_window": 0.001828153564899453,
+  "converged": true
+}
