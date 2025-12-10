@@ -49,12 +49,12 @@ GYRO = GyroConfig()
 FEATURES = ("min", "zero")
 OUT = ROOT / "results" / "detector"
 FIGURE = ROOT / "figures" / "detector_trace.png"
-IMU_PROPS = {
-    "imu_rate_hz": GYRO.rate_hz,
-    "imu_noise_dps": GYRO.noise_dps,
-    "imu_bias_dps": GYRO.bias_dps,
+IMU_PROPS = {  # property names read by scenarios/lua/device.lua
+    "rate_hz": GYRO.rate_hz,
+    "noise_dps": GYRO.noise_dps,
+    "bias_dps": GYRO.bias_dps,
     "imu_delay_s": GYRO.delay_s,
-    "imu_seed": GYRO.seed,
+    "seed": GYRO.seed,
 }
 
 

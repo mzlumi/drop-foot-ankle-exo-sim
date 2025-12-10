@@ -8,7 +8,8 @@ package.path = folder .. "/?.lua;" .. package.path
 local function mock_body( name )
 	local b = { name = name, mz = 0.0, calls = 0 }
 	function b:add_external_moment( x, y, z ) self.mz = self.mz + z; self.calls = self.calls + 1 end
-	function b:ang_vel() return { x = 0, y = 0, z = 2.0 * math.sin( 6.0 * clock ) } end
+	-- two harmonics, so that the detector finds heel strikes and toe-offs
+	function b:ang_vel() return { x = 0, y = 0, z = 4.0 * math.sin( 6.0 * clock ) + 2.0 * math.sin( 12.0 * clock + 1.0 ) } end
 	return b
 end
 clock = 0.0

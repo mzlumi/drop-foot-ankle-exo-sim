@@ -8,15 +8,18 @@
 -- only the change at each step. Python twin and tests: dropfoot.device.
 --
 -- Properties (strings, from the ScriptController block):
---   mode          none | constant | passive   (default none)
+--   mode          none | constant | passive | active   (default none)
 --   constant_nm, on_time, off_time    constant mode: tau between the two times
 --   k_nm_per_rad, theta0_rad          passive mode: tau = -k (theta - theta0)
+--   early_frac, brake_nms_per_rad, kp_nm_per_rad, kd_nms_per_rad, target_rad,
+--   swing_timeout_s                   active mode: the phase-based FSM (fsm.lua)
 --   act_delay_s, act_time_constant_s, limit_nm   actuator response (not used in passive mode)
 --   and the gyroscope and detector settings of imu.lua, which always run.
 
 local Gyro = require "gyro"
 local Detector = require "detector"
 local Actuator = require "actuator"
+local FSM = require "fsm"
 local RAD2DEG = 180.0 / math.pi
 
 local function num( name, default )
@@ -46,6 +49,10 @@ function init( model, par, side )
 	off_time = num( "off_time", 1e9 )
 	k_spring = num( "k_nm_per_rad", 0.0 )
 	theta0 = num( "theta0_rad", 0.0 )
+	fsm = FSM.new( {
+		early_frac = num( "early_frac" ), brake_nms_per_rad = num( "brake_nms_per_rad" ),
+		kp_nm_per_rad = num( "kp_nm_per_rad" ), kd_nms_per_rad = num( "kd_nms_per_rad" ),
+		target_rad = num( "target_rad" ), swing_timeout_s = num( "swing_timeout_s" ) } )
 
 	applied = 0.0 -- moment currently applied to talus_r (and its negative to tibia_r)
 	command = 0.0
@@ -66,8 +73,9 @@ end
 
 function update( model, t )
 	w_true = tibia:ang_vel().z * RAD2DEG
+	local event = 0
 	if gyro:update( t, w_true ) then
-		detector:update( t, gyro.output )
+		event = detector:update( t, gyro.output )
 	end
 	theta = ankle:position()
 	theta_dot = ankle:velocity()
@@ -79,6 +87,9 @@ function update( model, t )
 	elseif mode == "passive" then
 		command = -k_spring * ( theta - theta0 )
 		tau = command -- a spring has no actuator lag
+	elseif mode == "active" then
+		command = fsm:update( t, event, detector:phase( t ), theta, theta_dot )
+		tau = actuator:update( t, command )
 	else
 		command = 0.0
 		tau = 0.0
@@ -98,6 +109,7 @@ function store_data( frame )
 	frame:set_value( "det.hs_time", detector.hs_time )
 	frame:set_value( "det.to_time", detector.to_time )
 	frame:set_value( "det.phase", detector:phase( frame:time() ) )
+	frame:set_value( "dev.state", fsm.state )
 	frame:set_value( "dev.command", command )
 	frame:set_value( "dev.torque", applied )
 	frame:set_value( "dev.power", power )
