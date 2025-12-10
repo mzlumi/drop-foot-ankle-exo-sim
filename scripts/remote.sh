@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run SCONE on another machine that has Docker and the scone-headless image.
 #
-#   scripts/remote.sh <host> push          # copy code, scenarios and data/raw to <host>
+#   scripts/remote.sh <host> push          # copy code, scenarios and data/raw (not camargo) to <host>
 #   scripts/remote.sh <host> pull          # copy results/raw/{runs,eval,logs} back
 #   scripts/remote.sh <host> run <args>    # python scripts/run_scone.py <args> on <host>, detached
 #
@@ -19,7 +19,7 @@ case "$cmd" in
   push)
     rsync -az --delete \
       --exclude .git --exclude .venv --exclude results/raw --exclude '__pycache__' \
-      --exclude '.pytest_cache' --exclude 'scenarios/.eval_*' \
+      --exclude '.pytest_cache' --exclude 'scenarios/.eval_*' --exclude data/raw/camargo \
       "$root/" "$host:$remote/"
     ;;
   pull)
