@@ -28,15 +28,15 @@ DROPFOOT = """\
 # Written by dropfoot.scenarios.dropfoot_scenario; edit the template, not this file.
 CmaOptimizer {{
 	signature_prefix = DATE_TIME
-	init_file = ../results/healthy/seed1/healthy_asym.par
+	init_file = {up}/results/healthy/seed1/healthy_asym.par
 
 	SimulationObjective {{
 		max_duration = {duration:g}
 		signature_postfix = {tag}
 
 		ModelOpenSim3 {{
-			model_file = ../data/raw/scone-tutorials/data/Human0914.osim
-			state_init_file = ../data/raw/scone-tutorials/data/InitStateGait10.sto
+			model_file = {up}/data/raw/scone-tutorials/data/Human0914.osim
+			state_init_file = {up}/data/raw/scone-tutorials/data/InitStateGait10.sto
 			initial_state_offset = 0~0.01<-0.5,0.5>
 			initial_state_offset_exclude = "*_tx;*_ty;*_u"
 
@@ -46,9 +46,9 @@ CmaOptimizer {{
 		}}
 
 		# Geyer and Herr (2010) reflex controller, asymmetric
-		<< ../data/raw/scone-tutorials/data/ControllerGH2010asym.scone >>
+		<< {up}/data/raw/scone-tutorials/data/ControllerGH2010asym.scone >>
 
-		<< include/MeasureGait12.scone >>
+		<< {include}/MeasureGait12.scone >>
 	}}
 }}
 """
@@ -60,15 +60,23 @@ def strength_tag(factor: float) -> str:
     return f"ta{pct:g}"
 
 
-def dropfoot_scenario(factor: float, duration: float = 10.0) -> str:
+def dropfoot_scenario(factor: float, duration: float = 10.0, depth: int = 0) -> str:
+    """Scenario text for a file ``depth`` folders below scenarios/ (0: scenarios/ itself)."""
     if not 0 < factor <= 1:
         raise ValueError("factor must be in (0, 1]")
-    return DROPFOOT.format(pct=f"{100 * factor:g}", factor=factor, duration=duration, tag=strength_tag(factor))
+    up = "/".join([".."] * (depth + 1))
+    include = "/".join([".."] * depth + ["include"])
+    return DROPFOOT.format(
+        pct=f"{100 * factor:g}", factor=factor, duration=duration, tag=strength_tag(factor), up=up, include=include
+    )
 
 
 def write_dropfoot(factor: float, folder: Path = SCENARIOS, duration: float = 10.0) -> Path:
-    path = Path(folder) / f"dropfoot_{strength_tag(factor)}.scone"
-    path.write_text(dropfoot_scenario(factor, duration))
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    depth = len(folder.resolve().relative_to(SCENARIOS.resolve()).parts)
+    path = folder / f"dropfoot_{strength_tag(factor)}.scone"
+    path.write_text(dropfoot_scenario(factor, duration, depth))
     return path
 
 

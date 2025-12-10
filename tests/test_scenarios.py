@@ -17,6 +17,15 @@ def test_template_sets_only_tib_ant_r():
     assert "Apache-2.0" in text
 
 
+def test_generated_scenarios_point_two_folders_up(tmp_path, monkeypatch):
+    monkeypatch.setattr(scenarios, "SCENARIOS", tmp_path)
+    path = scenarios.write_dropfoot(0.3, tmp_path / "generated")
+    text = path.read_text()
+    assert "model_file = ../../data/raw/scone-tutorials/data/Human0914.osim" in text
+    assert "<< ../include/MeasureGait12.scone >>" in text
+    assert "init_file = ../../results/healthy/seed1/healthy_asym.par" in text
+
+
 def test_strength_tag():
     assert scenarios.strength_tag(0.25) == "ta25"
     assert scenarios.strength_tag(0.175) == "ta17.5"
