@@ -1,6 +1,7 @@
 -- Runs scenarios/lua/device.lua outside SCONE with mock bodies that sum every
 -- add_external_moment call, for tests/test_device.py.
 -- Usage: lua device_driver.lua <scenarios/lua folder> <mode> [key=value ...]
+-- (DEVICE_SCRIPT=device_bundle.lua runs the one-file bundle instead).
 -- Prints "t applied talus_sum tibia_sum command" per step (1 ms, 3 s).
 local folder = arg[ 1 ]
 package.path = folder .. "/?.lua;" .. package.path
@@ -26,7 +27,7 @@ for i = 3, #arg do
 	local k, v = arg[ i ]:match( "([^=]+)=(.+)" )
 	scone[ k ] = v
 end
-dofile( folder .. "/device.lua" )
+dofile( folder .. "/" .. ( os.getenv( "DEVICE_SCRIPT" ) or "device.lua" ) )
 init( model, nil, 1 )
 for i = 0, 2999 do
 	clock = i * 0.001

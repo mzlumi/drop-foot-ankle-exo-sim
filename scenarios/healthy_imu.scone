@@ -25,7 +25,7 @@ CmaOptimizer {
 
 			ScriptController {
 				name = IMU
-				script_file = "lua/imu.lua"
+				script_file = "lua/imu_bundle.lua"
 				body = tibia_r
 				rate_hz = 100
 				noise_dps = 0.5

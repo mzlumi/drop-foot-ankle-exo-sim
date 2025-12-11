@@ -1,5 +1,6 @@
 """Device script: moment bookkeeping, actuator response, and the SCONE pulse test."""
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -15,10 +16,11 @@ DATA = Path(__file__).parent / "data"
 LUA = shutil.which("lua") is not None
 
 
-def run_device(mode, **props):
-    args = ["lua", str(Path(__file__).parent / "lua" / "device_driver.lua"), str(ROOT / "scenarios" / "lua"), mode]
+def run_device(mode, folder=ROOT / "scenarios" / "lua", script=None, **props):
+    args = ["lua", str(Path(__file__).parent / "lua" / "device_driver.lua"), str(folder), mode]
     args += [f"{k}={v}" for k, v in props.items()]
-    out = subprocess.run(args, capture_output=True, text=True, check=True).stdout.split("\n")
+    env = {"PATH": os.environ["PATH"], **({"DEVICE_SCRIPT": script} if script else {})}
+    out = subprocess.run(args, capture_output=True, text=True, check=True, env=env).stdout.split("\n")
     return np.array([[float(x) for x in line.split()] for line in out if line.strip()])
 
 
@@ -94,3 +96,22 @@ def test_scone_pulse_response_is_mirrored_and_decays():
     torque = col("torque_plus")
     assert np.all(torque[(t > 2.251) & (t < 2.299)] == 2.0) and np.all(torque[(t < 2.249) | (t > 2.301)] == 0.0)
     assert abs(dp[np.searchsorted(t, 2.5)]) < 0.1 * np.max(np.abs(dp))
+
+
+def test_lua_bundles_are_up_to_date():
+    from dropfoot.scenarios import LUA, LUA_BUNDLES, lua_bundle
+
+    for main in LUA_BUNDLES:
+        assert (LUA / f"{main}_bundle.lua").read_text() == lua_bundle(main), "run python scripts/bundle_lua.py"
+
+
+@pytest.mark.skipif(not LUA, reason="lua interpreter not installed")
+def test_device_bundle_runs_alone_like_the_modules(tmp_path):
+    """SCONE runs the copied script from the optimization's output folder, where no module is found."""
+    shutil.copy(ROOT / "scenarios/lua/device_bundle.lua", tmp_path)
+    props = {"early_frac": 0.15, "brake_nms_per_rad": 1.0, "kp_nm_per_rad": 30, "kd_nms_per_rad": 0.6,
+             "target_rad": 0.087, "swing_timeout_s": 0.8, "act_delay_s": 0.009, "act_time_constant_s": 0.002, "limit_nm": 14}
+    ref = run_device("active", **props)
+    alone = run_device("active", folder=tmp_path, script="device_bundle.lua", **props)
+    np.testing.assert_array_equal(alone, ref)
+    assert np.abs(ref[:, 1]).max() > 0

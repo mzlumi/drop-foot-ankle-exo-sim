@@ -5,7 +5,7 @@
 # (commit 8cc814822c58356e110027d80962ebf0f024e116, Apache-2.0).
 # Changes: paths point at data/raw/scone-tutorials, external forces enabled,
 # the reflex controller runs next to the exoskeleton script
-# (scenarios/lua/device.lua), and the gait measure is MeasureGait12.
+# (scenarios/lua/device.lua, run as device_bundle.lua), and the gait measure is MeasureGait12.
 # Written by dropfoot.scenarios.device_scenario; edit the template, not this file.
 CmaOptimizer {
 	signature_prefix = DATE_TIME
@@ -29,7 +29,7 @@ CmaOptimizer {
 
 			ScriptController {
 				name = Exo
-				script_file = "../lua/device.lua"
+				script_file = "../lua/device_bundle.lua"
 				mode = none
 				constant_nm = 0.0
 				on_time = 2.25
