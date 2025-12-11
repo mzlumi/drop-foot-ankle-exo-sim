@@ -68,7 +68,7 @@ def test_select_setting_prefers_all_walking_then_closest_then_lower():
         for s in (1, 2, 3):
             walks = s > falls
             rows.append({"device": "passive", "setting": f"k{value}", "value": value, "seed": s, "walks": walks,
-                         "min_toe_clearance_mm": toe if walks else float("nan")})
+                         "duration_s": 10.0 if walks else 4.0, "min_toe_clearance_mm": toe if walks else float("nan")})
     df = pd.DataFrame(rows)
     sel = select_setting(df, "passive", healthy_toe=36.0)
     # k20 and k40 are both 4 mm from healthy: the lower one wins; k80 is closer but a seed falls
@@ -78,3 +78,7 @@ def test_select_setting_prefers_all_walking_then_closest_then_lower():
     few = df.assign(walks=((df.value == 80) & (df.seed > 1)) | ((df.value == 10) & (df.seed == 3)))
     sel = select_setting(few, "passive", healthy_toe=36.0)
     assert sel["setting"] == "k80" and not sel["all_seeds_walk"] and sel["seeds_walking"] == 2
+    # nothing walks: the longest mean time before the fall decides
+    falls = df.assign(walks=False, duration_s=df.value.map({10: 3.0, 20: 5.5, 40: 5.5, 80: 2.0}))
+    sel = select_setting(falls, "passive", healthy_toe=36.0)
+    assert sel["setting"] == "k20" and sel["seeds_walking"] == 0

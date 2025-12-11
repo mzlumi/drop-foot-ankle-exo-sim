@@ -96,6 +96,8 @@ The hypothesis is supported if all three hold, and rejected if any fails by more
 
 **If 25% does not work.** If fewer than three adapted seeds walk at 25% strength, the experiment moves to the weakest tested level (50%) at which all three do, and the README says so.
 
+**Addendum to the tuning rule (added in a later commit, before the comparison was run).** The rule above does not say what to do when no setting lets all three seeds walk with the frozen controller. A trial of the pipeline on intermediate, unconverged drop-foot results showed that this can happen (most frozen settings fell). The rule is therefore completed, for both devices alike: among the settings with the most seeds walking, the toe clearance closest to healthy decides; if no seed walks with any setting, the longest mean time before the fall decides; then the lower setting. Nothing else changes, and the comparison itself was not run before this was committed.
+
 ## Data
 
 [`data/README.md`](data/README.md) describes every input and how to get it. In short:

@@ -133,14 +133,18 @@ def select_setting(df: pd.DataFrame, device: str, healthy_toe: float, metric: st
 
     Among the settings with the most seeds walking (all of them, normally),
     the one whose mean ``metric`` over walking seeds is closest to
-    ``healthy_toe``, the lower ``value`` on a tie.
+    ``healthy_toe``, the lower ``value`` on a tie. When no setting lets any
+    seed walk, the metric cannot be compared and the longest mean time
+    before the fall (column ``duration_s``) decides instead, then the lower
+    value.
     """
     d = df[df.device == device]
-    g = d.groupby("value").agg(walking=("walks", "sum"), runs=("walks", "size")).reset_index()
+    g = d.groupby("value").agg(walking=("walks", "sum"), runs=("walks", "size"), duration_s=("duration_s", "mean")).reset_index()
     g["toe"] = g.value.map(d[d.walks].groupby("value")[metric].mean())
     g["distance_mm"] = (g.toe - healthy_toe).abs()
     top = g.walking.max()
-    pool = g[g.walking == top].sort_values(["distance_mm", "value"])
+    g["minus_duration"] = -g.duration_s
+    pool = g[g.walking == top].sort_values(["distance_mm", "minus_duration", "value"])
     best = pool.iloc[0]
     return {
         "device": device,
@@ -150,5 +154,6 @@ def select_setting(df: pd.DataFrame, device: str, healthy_toe: float, metric: st
         "seeds_walking": int(top),
         "toe_clearance_mm": float(best.toe),
         "distance_from_healthy_mm": float(best.distance_mm),
-        "candidates": g.to_dict(orient="records"),
+        "mean_duration_s": float(best.duration_s),
+        "candidates": g.drop(columns="minus_duration").to_dict(orient="records"),
     }
