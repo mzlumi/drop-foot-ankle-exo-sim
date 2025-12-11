@@ -25,6 +25,17 @@ Every result in `results/` was produced with the software below. CMA-ES results 
 | Container runtime | OrbStack 2.2.3, Docker 29.4.0, Linux VM with 10 CPUs and 8 GB RAM |
 | Emulation | amd64 image on an arm64 host (Rosetta inside OrbStack) |
 
+Long optimizations (the drop-foot, device and second-speed runs) ran on a second computer through `scripts/remote.sh`:
+
+| Item | Value |
+|---|---|
+| Computer | Apple M4 Max, 14 cores (10 performance, 4 efficiency), 36 GB RAM |
+| Operating system | macOS 26.4.1 |
+| Container | the same `scone-headless` image, moved with `docker save` and `docker load` (the containerd image store reports it as `sha256:39bb2bb58cdf...`) |
+| Runner | system Python 3.9.6, standard library only (`PYTHONPATH=src python3 scripts/run_scone.py`) |
+
+Check: `results/healthy/seed1/best.par` evaluated on both computers gives the same `.sto` to the last digit (all 2001 x 593 values equal) and the same cost, 0.545881.
+
 ## Python
 
 | Package | Version |
@@ -35,4 +46,5 @@ Every result in `results/` was produced with the software below. CMA-ES results 
 | pandas | 3.0.6 |
 | Matplotlib | 3.11.2 |
 | pytest | 9.1.1 |
+| mat-io | 1.0.0 (reads the Camargo et al. MATLAB tables) |
 | scone-gait | 0.1.0, companion repository commit `2d137a245daa4520f7525ed84d9c79cd93163749` |
