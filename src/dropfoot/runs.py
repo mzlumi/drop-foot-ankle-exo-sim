@@ -23,6 +23,7 @@ CONVERGED_WINDOW = 40  # generations
 CONVERGED_REL = 0.01
 
 _PAR = re.compile(r"^(\d+)_([-\d.eE+]+)_([-\d.eE+]+)\.par$")
+_INIT = re.compile(r"^\s*init_file\s*=\s*\"?([^\"\s]+)", re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -36,14 +37,27 @@ class RunSummary:
     best_cost_window_start: float  # best cost at generation (generations - window)
     rel_improvement_window: float
     converged: bool
+    init_file: str = ""  # warm start; an earlier run's .par for a continuation
+
+
+def init_file(run: Path) -> str:
+    """The ``init_file`` of the run's optimizer, as written in its ``config.scone`` ("" if none)."""
+    config = run / "config.scone"
+    m = _INIT.search(config.read_text()) if config.exists() else None
+    return m.group(1) if m else ""
 
 
 def par_files(run: Path) -> list[tuple[int, float, Path]]:
-    """(generation, best cost, path) of every numbered ``.par`` in a run folder, by generation."""
+    """(generation, best cost, path) of every numbered ``.par`` written by the run, by generation.
+
+    SCONE copies the init file into the run folder; a continuation run starts
+    from a numbered ``.par`` of an earlier run, so that copy is skipped.
+    """
+    skip = Path(init_file(run)).name
     out = []
     for p in run.glob("*.par"):
         m = _PAR.match(p.name)
-        if m:
+        if m and p.name != skip:
             out.append((int(m.group(1)), float(m.group(3)), p))
     return sorted(out)
 
@@ -77,6 +91,7 @@ def summarize_run(run: Path, seed: int, window: int = CONVERGED_WINDOW, rel: flo
         best_cost_window_start=start,
         rel_improvement_window=float(improvement),
         converged=bool(np.isfinite(improvement) and improvement < rel),
+        init_file=init_file(run),
     )
 
 

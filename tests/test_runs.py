@@ -29,6 +29,18 @@ def test_not_converged_when_still_improving(tmp_path):
     assert not s.converged
 
 
+def test_continuation_skips_the_copied_init_file(tmp_path):
+    run = _run(tmp_path / "r", {0: 0.8, 30: 0.6}, last=50)
+    (run / "0149_13.066_0.817.par").write_text("p 1 1 0.1\n")
+    (run / "config.scone").write_text(
+        'CmaOptimizer {\n\tinit_file = "../runs/x.s2/R2/0149_13.066_0.817.par"\n'
+        '\tstate_init_file = "InitStateGait10.sto"\n}\n'
+    )
+    s = summarize_run(run, seed=2, window=40, rel=0.01)
+    assert (s.best_generation, s.best_cost) == (30, 0.6)
+    assert s.init_file.endswith("0149_13.066_0.817.par")
+
+
 def test_curate_and_latest(tmp_path):
     _run(tmp_path / "runs" / "261006.0700.R1", {0: 1.0}, last=3)
     newer = _run(tmp_path / "runs" / "261006.0800.R1", {0: 0.9, 2: 0.8}, last=3)
