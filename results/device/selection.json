@@ -61,13 +61,13 @@
     "seeds_walking": 0,
     "toe_clearance_mm": NaN,
     "distance_from_healthy_mm": NaN,
-    "mean_duration_s": 6.586666666666667,
+    "mean_duration_s": 6.575,
     "candidates": [
       {
         "value": 0.0,
         "walking": 0,
         "runs": 3,
-        "duration_s": 5.135000000000001,
+        "duration_s": 5.14,
         "toe": NaN,
         "distance_mm": NaN
       },
@@ -75,7 +75,7 @@
         "value": 5.0,
         "walking": 0,
         "runs": 3,
-        "duration_s": 4.42,
+        "duration_s": 4.416666666666667,
         "toe": NaN,
         "distance_mm": NaN
       },
@@ -83,7 +83,7 @@
         "value": 10.0,
         "walking": 0,
         "runs": 3,
-        "duration_s": 6.586666666666667,
+        "duration_s": 6.575,
         "toe": NaN,
         "distance_mm": NaN
       }
