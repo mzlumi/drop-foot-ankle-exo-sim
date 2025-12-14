@@ -25,6 +25,7 @@ import os
 import shlex
 import shutil
 import subprocess
+import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
@@ -139,6 +140,16 @@ def remote_evaluate_commands(
     ]
 
 
+def _run_ssh(cmd: list[str], attempts: int = 5) -> subprocess.CompletedProcess:
+    """Run an ssh or rsync command, retrying when the connection itself fails (exit code 255)."""
+    for i in range(attempts):
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        if proc.returncode != 255:
+            break
+        time.sleep(2 + 3 * i)
+    return proc
+
+
 def evaluate(
     scenario: str | Path,
     par: str | Path,
@@ -156,9 +167,9 @@ def evaluate(
     try:
         if REMOTE_HOST:
             push, run, pull = remote_evaluate_commands(files, REMOTE_HOST, overrides)
-            subprocess.run(push, check=True, capture_output=True)
-            proc = subprocess.run(run, capture_output=True, text=True)
-            subprocess.run(pull, capture_output=True)
+            _run_ssh(push).check_returncode()
+            proc = _run_ssh(run)
+            _run_ssh(pull)
             if not files.report.exists():
                 files.report.write_text(proc.stdout + proc.stderr)
         else:
