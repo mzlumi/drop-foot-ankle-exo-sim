@@ -30,6 +30,32 @@ Feature choice: by the rule fixed in the script before the results were seen
 controller uses `min` (`chosen_feature.txt`). The choice is revisited only
 with the drop-foot gait added, on simulated data, never on the Camargo data.
 
+## Adapted drop-foot gait at 25% strength, 3 seeds, 112 heel strikes and 114 toe-offs
+
+`python analysis/part_d_validation.py --dropfoot 0.25`, with the adapted
+controllers of `results/dropfoot_ta25` (optimized over 10 s). Seeds 1 and 2
+walk the full 60 s; seed 3 falls at 41.5 s and is scored up to its fall.
+
+| HS feature | HS missed / false | HS error (ms) | HS latency (ms) | TO missed / false | TO error (ms) | TO latency (ms) | phase error mean / RMS (% cycle) |
+|---|---|---|---|---|---|---|---|
+| min | 1 / 0 | +23.7 +/- 14.1 | 36.4 | 2 / 0 | -26.8 +/- 22.0 | 4.2 | -1.3 / 2.8 |
+| zero | 1 / 1 | -70.4 +/- 40.2 | -65.6 | 2 / 1 | -26.8 +/- 22.0 | 4.2 | +5.6 / 7.1 |
+
+The detector still finds 99% of the events, but the drop-foot shank pattern
+widens every error distribution:
+
+* **The `zero` feature breaks down.** Its heel strike comes 39 to 119 ms
+  early depending on the seed: the adapted gaits differ in how long the
+  shank keeps swinging forward before the flat or toe-first contact, so the
+  zero crossing no longer marks contact. `min` stays at +14 to +30 ms.
+* **Toe-off is earlier and more variable** (-27 +/- 22 ms against -13 +/- 3
+  ms healthy): with the foot plantarflexed in late stance the toe keeps
+  contact while the shank already rotates into swing. All missed events
+  (one heel strike, two toe-offs) are in seed 1.
+* Neither feature is free of missed events on drop foot, so the rule falls
+  back on the lower pooled heel-strike error and keeps `min` (24.6 ms against
+  60.0 ms). The controller setting does not change.
+
 ## Sim to real: Camargo et al. (2021), 20 subjects at 1.2 m/s
 
 `python analysis/part_d_camargo.py`. The calibrated shank gyroscope of each

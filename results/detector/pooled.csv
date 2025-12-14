@@ -1,3 +1,5 @@
 condition,feature,seeds,hs_n_true,hs_missed,hs_false,hs_error_mean_ms,hs_error_sd_ms,hs_error_mae_ms,hs_error_max_abs_ms,hs_latency_mean_ms,hs_latency_max_ms,to_n_true,to_missed,to_false,to_error_mean_ms,to_error_sd_ms,to_error_mae_ms,to_error_max_abs_ms,to_latency_mean_ms,to_latency_max_ms,phase_error_mean_pct,phase_error_rms_pct
 healthy,min,3,127,0,0,25.42,2.865,25.42,30.56,37.78,43.07,129,0,0,-12.99,3.018,12.99,18.48,9.956,15.51,-1.53,2.406
 healthy,zero,3,127,0,0,-50.61,1.441,50.61,53.7,-45.6,-37.78,129,0,0,-12.99,3.018,12.99,18.48,9.956,15.51,4.053,4.42
+dropfoot_ta25,min,3,112,1,0,23.72,14.11,23.72,72.74,36.42,92.74,114,2,0,-26.76,22.05,26.76,131.8,4.226,28.35,-1.296,2.82
+dropfoot_ta25,zero,3,112,1,1,-70.45,40.19,70.66,124.1,-65.65,17.98,114,2,1,-26.76,22.05,26.76,131.8,4.226,28.35,5.612,7.117
