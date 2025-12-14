@@ -1,0 +1,13 @@
+condition,value,seed,walks,cost,duration_s,min_toe_clearance_mm
+passive_ta25_k0.5,0.5,1,True,0.646693,10,53.3275
+passive_ta25_k0.5,0.5,2,True,0.69582,10,61.9633
+passive_ta25_k0.5,0.5,3,True,0.589625,10,57.8355
+passive_ta25_k1,1,1,True,0.646369,10,55.3481
+passive_ta25_k1,1,2,True,0.696158,10,62.2434
+passive_ta25_k1,1,3,True,0.589024,10,58.3613
+passive_ta25_k2.5,2.5,1,True,0.647572,10,59.764
+passive_ta25_k2.5,2.5,2,True,0.697592,10,63.515
+passive_ta25_k2.5,2.5,3,True,0.638864,10,60.716
+passive_ta25_k5,5,1,False,44.9689,6.315,
+passive_ta25_k5,5,2,True,0.700881,10,62.5077
+passive_ta25_k5,5,3,False,78.349,2.96,

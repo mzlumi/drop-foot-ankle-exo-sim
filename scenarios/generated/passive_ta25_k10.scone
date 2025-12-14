@@ -1,0 +1,50 @@
+# Drop foot (ta25) wearing the passive AFO k10 (analysis/part_f.py).
+# Derived from scone-core scenarios/Tutorials/Tutorial 4a - Gait.scone,
+# Tutorial 5a - Pathological Gait - Weak Plantarflexors.scone and
+# Tutorial 6b - Script - Balance Device.scone
+# (commit 8cc814822c58356e110027d80962ebf0f024e116, Apache-2.0).
+# Changes: paths point at data/raw/scone-tutorials, external forces enabled,
+# the reflex controller runs next to the exoskeleton script
+# (scenarios/lua/device.lua, run as device_bundle.lua), and the gait measure is MeasureGait12.
+# Written by dropfoot.scenarios.device_scenario; edit the template, not this file.
+CmaOptimizer {
+	signature_prefix = DATE_TIME
+	init_file = ../../results/dropfoot_ta25/seed1/best.par
+
+	SimulationObjective {
+		max_duration = 10
+		signature_postfix = passive_ta25_k10
+
+		ModelOpenSim3 {
+			model_file = ../../data/raw/scone-tutorials/data/Human0914.osim
+			state_init_file = ../../data/raw/scone-tutorials/data/InitStateGait10.sto
+			initial_state_offset = 0~0.01<-0.5,0.5>
+			initial_state_offset_exclude = "*_tx;*_ty;*_u"
+			enable_external_forces = 1
+
+			Properties {
+				tib_ant_r { max_isometric_force.factor = 0.25 }
+			}
+		}
+
+		CompositeController {
+			# Geyer and Herr (2010) reflex controller, asymmetric
+			<< ../../data/raw/scone-tutorials/data/ControllerGH2010asym.scone >>
+
+			ScriptController {
+				name = Exo
+				script_file = "../lua/device_bundle.lua"
+				mode = passive
+				k_nm_per_rad = 10.0
+				theta0_rad = 0.0
+				rate_hz = 100.0
+				noise_dps = 0.5
+				bias_dps = 2.0
+				imu_delay_s = 0.015
+				seed = 1
+			}
+		}
+
+		<< ../include/MeasureGait12.scone >>
+	}
+}

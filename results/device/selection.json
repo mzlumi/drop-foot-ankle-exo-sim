@@ -1,0 +1,92 @@
+{
+  "level": 0.25,
+  "healthy_toe_clearance_mm": 36.27846666666667,
+  "passive": {
+    "device": "passive",
+    "value": 160.0,
+    "setting": "k160",
+    "all_seeds_walk": false,
+    "seeds_walking": 1,
+    "toe_clearance_mm": 53.27264,
+    "distance_from_healthy_mm": 16.994173333333336,
+    "mean_duration_s": 6.278333333333333,
+    "candidates": [
+      {
+        "value": 10.0,
+        "walking": 1,
+        "runs": 3,
+        "duration_s": 5.328333333333333,
+        "toe": 63.695675,
+        "distance_mm": 27.417208333333335
+      },
+      {
+        "value": 20.0,
+        "walking": 1,
+        "runs": 3,
+        "duration_s": 4.4366666666666665,
+        "toe": 56.294549999999994,
+        "distance_mm": 20.016083333333327
+      },
+      {
+        "value": 40.0,
+        "walking": 1,
+        "runs": 3,
+        "duration_s": 5.138333333333333,
+        "toe": 59.868399999999994,
+        "distance_mm": 23.589933333333327
+      },
+      {
+        "value": 80.0,
+        "walking": 1,
+        "runs": 3,
+        "duration_s": 6.403333333333333,
+        "toe": 62.46772,
+        "distance_mm": 26.189253333333333
+      },
+      {
+        "value": 160.0,
+        "walking": 1,
+        "runs": 3,
+        "duration_s": 6.278333333333333,
+        "toe": 53.27264,
+        "distance_mm": 16.994173333333336
+      }
+    ]
+  },
+  "active": {
+    "device": "active",
+    "value": 10.0,
+    "setting": "t10",
+    "all_seeds_walk": false,
+    "seeds_walking": 0,
+    "toe_clearance_mm": NaN,
+    "distance_from_healthy_mm": NaN,
+    "mean_duration_s": 6.586666666666667,
+    "candidates": [
+      {
+        "value": 0.0,
+        "walking": 0,
+        "runs": 3,
+        "duration_s": 5.135000000000001,
+        "toe": NaN,
+        "distance_mm": NaN
+      },
+      {
+        "value": 5.0,
+        "walking": 0,
+        "runs": 3,
+        "duration_s": 4.42,
+        "toe": NaN,
+        "distance_mm": NaN
+      },
+      {
+        "value": 10.0,
+        "walking": 0,
+        "runs": 3,
+        "duration_s": 6.586666666666667,
+        "toe": NaN,
+        "distance_mm": NaN
+      }
+    ]
+  }
+}

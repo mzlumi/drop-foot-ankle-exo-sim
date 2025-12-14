@@ -2,6 +2,7 @@
 """Part F: the device experiment (tuning on frozen controllers, re-optimization, comparison).
 
     python analysis/part_f.py frozen               # F3: tuning sweeps, frozen drop-foot controllers
+    python analysis/part_f.py soft                 # how soft a spring the frozen controllers tolerate
     python analysis/part_f.py reopt                # writes the re-optimization scenarios, prints the runs
     python analysis/part_f.py compare              # F4: table, figure and the hypothesis verdict
 
@@ -17,8 +18,13 @@ dropfoot.fsm.FSMConfig, the actuator fit of Part E clipped at the Part C
 torque limit). For each device the chosen setting is, among the settings
 with which all seeds walk 10 s, the one whose toe clearance is closest to the
 healthy mean, the lower setting on a tie. If no setting lets every seed walk,
-the most seeds walking decides first (reported). Writes
-results/device/frozen.csv and results/device/selection.json.
+the most seeds walking decides first (reported), and if no seed walks at all,
+the longest mean time before the fall. Writes results/device/frozen.csv and
+results/device/selection.json.
+
+``soft``. A check outside the tuning: the passive AFO at 0.5 to 5 N m/rad on
+the same frozen controllers, to find how small a spring already makes them
+fall. Writes results/device/frozen_soft_springs.csv.
 
 ``reopt``. Writes the scenarios that the three re-optimizations use: no
 device, the chosen passive and the chosen active setting, each started from
@@ -73,6 +79,7 @@ SEEDS = (1, 2, 3)
 LEVEL = 0.25
 PASSIVE_K = (10.0, 20.0, 40.0, 80.0, 160.0)
 ACTIVE_TARGET_DEG = (0.0, 5.0, 10.0)
+SOFT_K = (0.5, 1.0, 2.5, 5.0)
 REOPT_GENERATIONS = 150
 OUT = ROOT / "results" / "device"
 FIGURE = ROOT / "figures" / "device_comparison.png"
@@ -161,6 +168,19 @@ def cmd_frozen(level: float, workers: int) -> None:
     (OUT / "selection.json").write_text(json.dumps(sel, indent=2) + "\n")
     print(df[first].to_string(index=False))
     print(json.dumps({k: {kk: v[kk] for kk in ("setting", "all_seeds_walk", "toe_clearance_mm")} for k, v in sel.items() if isinstance(v, dict)}, indent=1))
+
+
+def cmd_soft(level: float, workers: int) -> None:
+    jobs, keys = [], []
+    for k in SOFT_K:
+        name, scen = scenario("passive", f"k{k:g}", passive_props(k), level)
+        for s in SEEDS:
+            jobs.append((scen, adapted_par(level, s), f"diag_{name}_s{s}"))
+            keys.append({"condition": name, "value": k, "seed": s})
+    rows = [row_for(sto, rep, **k) for (sto, rep), k in zip(evaluate_many(jobs, workers), keys)]
+    df = pd.DataFrame(rows)[["condition", "value", "seed", "walks", "cost", "duration_s", TOE]]
+    df.to_csv(OUT / "frozen_soft_springs.csv", index=False, float_format="%.6g")
+    print(df.to_string(index=False))
 
 
 def reopt_conditions(level: float):
@@ -332,11 +352,12 @@ def cmd_compare(level: float, workers: int) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=("frozen", "reopt", "compare"))
+    ap.add_argument("command", choices=("frozen", "soft", "reopt", "compare"))
     ap.add_argument("--level", type=float, default=LEVEL)
     ap.add_argument("--workers", type=int, default=6)
     args = ap.parse_args()
-    {"frozen": lambda: cmd_frozen(args.level, args.workers), "reopt": lambda: cmd_reopt(args.level),
+    {"frozen": lambda: cmd_frozen(args.level, args.workers), "soft": lambda: cmd_soft(args.level, args.workers),
+     "reopt": lambda: cmd_reopt(args.level),
      "compare": lambda: cmd_compare(args.level, args.workers)}[args.command]()
 
 
