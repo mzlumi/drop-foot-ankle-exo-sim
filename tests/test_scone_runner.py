@@ -49,6 +49,19 @@ def test_prepare_evaluation_puts_par_next_to_scenario_copy(tmp_path):
     assert not files.scenario.exists() and not files.par.exists()
 
 
+def test_remote_evaluation_copies_in_runs_and_copies_back(tmp_path):
+    files = scone.EvalFiles(
+        tmp_path / "scenarios" / ".eval_t.scone", tmp_path / "scenarios" / ".eval_t.par",
+        tmp_path / "out" / "r.par", tmp_path / "out" / "r.par.txt",
+    )
+    push, run, pull = scone.remote_evaluate_commands(files, "h", {"a.b": 2}, root=tmp_path)
+    assert push[-1] == f"h:{scone.REMOTE_ROOT}/scenarios/"
+    assert run[:2] == ["ssh", "h"]
+    assert "run_scone.py evaluate scenarios/.eval_t.scone scenarios/.eval_t.par --out out/r.par a.b=2" in run[2]
+    assert "rm -f scenarios/.eval_t.scone scenarios/.eval_t.par" in run[2]
+    assert pull[2:4] == [f"h:{scone.REMOTE_ROOT}/out/r.par.sto", f"h:{scone.REMOTE_ROOT}/out/r.par.txt"]
+
+
 def test_export_channels_selects_cuts_and_rounds(tmp_path):
     t = np.arange(0, 1.0, 0.1)
     data = np.column_stack([np.pi * t, t, -t])

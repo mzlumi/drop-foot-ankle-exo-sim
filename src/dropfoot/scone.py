@@ -22,6 +22,7 @@ for its settings file.
 from __future__ import annotations
 
 import os
+import shlex
 import shutil
 import subprocess
 import uuid
@@ -35,6 +36,8 @@ CONTAINER_ROOT = "/work"
 SETTINGS_DIR = ROOT / "scenarios" / "settings"
 RUNS_DIR = ROOT / "results" / "raw" / "runs"
 EVAL_DIR = ROOT / "results" / "raw" / "eval"
+REMOTE_HOST = os.environ.get("SCONE_HOST", "")  # ssh host that runs evaluations, e.g. "studio"
+REMOTE_ROOT = "Projects/drop-foot-ankle-exo-sim"  # relative to the remote home, as in scripts/remote.sh
 
 
 def container_path(path: str | Path, root: Path = ROOT) -> str:
@@ -113,6 +116,29 @@ def evaluate_command(files: EvalFiles, overrides: dict[str, object] | None = Non
     return docker_prefix(None, root) + args
 
 
+def remote_evaluate_commands(
+    files: EvalFiles, host: str, overrides: dict[str, object] | None = None, root: Path = ROOT
+) -> list[list[str]]:
+    """Commands that evaluate ``files`` on ``host`` (copy in, run, copy the outputs back).
+
+    The host holds a copy of the repository at ``REMOTE_ROOT`` (``scripts/remote.sh
+    push``); only the temporary scenario and ``.par`` are copied for each evaluation.
+    """
+    rel = [Path(p).resolve().relative_to(root.resolve()).as_posix() for p in (files.scenario, files.par, files.output)]
+    scen, par, out = rel
+    remote_dir = f"{host}:{REMOTE_ROOT}/{Path(scen).parent.as_posix()}/"
+    args = ["scripts/run_scone.py", "evaluate", scen, par, "--out", out]
+    args += [f"{k}={v}" for k, v in (overrides or {}).items()]
+    run = f"cd {REMOTE_ROOT} && mkdir -p {shlex.quote(Path(out).parent.as_posix())} && "
+    run += f"PYTHONPATH=src python3 {shlex.join(args)}; rc=$?; rm -f {shlex.quote(scen)} {shlex.quote(par)}; exit $rc"
+    back = [f"{host}:{REMOTE_ROOT}/{out}.sto", f"{host}:{REMOTE_ROOT}/{out}.txt"]
+    return [
+        ["rsync", "-a", str(files.scenario), str(files.par), remote_dir],
+        ["ssh", host, f"zsh -lc {shlex.quote(run)}"],
+        ["rsync", "-a", *back, str(files.output.parent) + "/"],
+    ]
+
+
 def evaluate(
     scenario: str | Path,
     par: str | Path,
@@ -122,15 +148,24 @@ def evaluate(
     """Evaluate ``par`` with ``scenario``; returns the written ``.sto`` file.
 
     ``output`` is a path such as ``results/raw/eval/x.par``; SCONE writes
-    ``x.par.sto`` and the objective breakdown is saved as ``x.par.txt``.
+    ``x.par.sto`` and the objective breakdown is saved as ``x.par.txt``. With
+    ``SCONE_HOST`` set, the evaluation runs on that host over ssh.
     """
     files = prepare_evaluation(scenario, par, output)
+    sto = files.output.with_name(files.output.name + ".sto")
     try:
-        proc = subprocess.run(evaluate_command(files, overrides), capture_output=True, text=True)
+        if REMOTE_HOST:
+            push, run, pull = remote_evaluate_commands(files, REMOTE_HOST, overrides)
+            subprocess.run(push, check=True, capture_output=True)
+            proc = subprocess.run(run, capture_output=True, text=True)
+            subprocess.run(pull, capture_output=True)
+            if not files.report.exists():
+                files.report.write_text(proc.stdout + proc.stderr)
+        else:
+            proc = subprocess.run(evaluate_command(files, overrides), capture_output=True, text=True)
+            files.report.write_text(proc.stdout + proc.stderr)
     finally:
         files.cleanup()
-    files.report.write_text(proc.stdout + proc.stderr)
-    sto = files.output.with_name(files.output.name + ".sto")
     if proc.returncode != 0 or not sto.exists():
         raise RuntimeError(f"SCONE evaluation failed, see {files.report}")
     return sto
