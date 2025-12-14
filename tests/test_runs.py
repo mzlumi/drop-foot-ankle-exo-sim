@@ -41,6 +41,19 @@ def test_continuation_skips_the_copied_init_file(tmp_path):
     assert s.init_file.endswith("0149_13.066_0.817.par")
 
 
+def test_curate_copies_the_histories_of_earlier_stages(tmp_path):
+    runs = tmp_path / "runs" / "c.s1"
+    first = _run(runs / "261006.0700.R1", {0: 2.0, 140: 1.0}, last=149)
+    second = _run(runs / "261006.0900.R1", {3: 0.9}, last=60)
+    (second / "config.scone").write_text(f'\tinit_file = "../results/raw/runs/c.s1/{first.name}/0140_1.010_1.000.par"\n')
+    third = _run(runs / "261006.1100.R1", {5: 0.8}, last=45)
+    (third / "config.scone").write_text(f'\tinit_file = "../results/raw/runs/c.s1/{second.name}/0003_0.910_0.900.par"\n')
+    curate(third, 1, tmp_path / "out")
+    assert (tmp_path / "out" / "history_stage1.txt").read_text() == (first / "history.txt").read_text()
+    assert (tmp_path / "out" / "history_stage2.txt").read_text() == (second / "history.txt").read_text()
+    assert not (tmp_path / "out" / "history_stage3.txt").exists()
+
+
 def test_curate_and_latest(tmp_path):
     _run(tmp_path / "runs" / "261006.0700.R1", {0: 1.0}, last=3)
     newer = _run(tmp_path / "runs" / "261006.0800.R1", {0: 0.9, 2: 0.8}, last=3)

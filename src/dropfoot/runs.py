@@ -103,13 +103,35 @@ def latest_run(root: Path) -> Path:
     return runs[-1]
 
 
+def earlier_stages(run: Path) -> list[Path]:
+    """Runs that ``run`` continues, oldest first, following ``init_file`` into other run folders."""
+    stages = []
+    current = run
+    while True:
+        init = init_file(current)
+        if "runs/" not in init:
+            break
+        prev = run.parents[1] / Path(init.split("runs/", 1)[1]).parent
+        if not (prev / "history.txt").exists() or prev in stages:
+            break
+        stages.insert(0, prev)
+        current = prev
+    return stages
+
+
 def curate(run: Path, seed: int, dest: Path) -> RunSummary:
-    """Copy the best ``.par`` (as ``best.par``), ``history.txt`` and the run's ``config.scone`` to ``dest``."""
+    """Copy the best ``.par`` (as ``best.par``), ``history.txt`` and the run's ``config.scone`` to ``dest``.
+
+    For a continuation, the histories of the runs it continues are copied as
+    ``history_stage1.txt``, ``history_stage2.txt``, ... (oldest first).
+    """
     summary = summarize_run(run, seed)
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(run / summary.best_par, dest / "best.par")
     for name in ("history.txt", "config.scone"):
         if (run / name).exists():
             shutil.copyfile(run / name, dest / name)
+    for i, prev in enumerate(earlier_stages(run), start=1):
+        shutil.copyfile(prev / "history.txt", dest / f"history_stage{i}.txt")
     (dest / "run.json").write_text(json.dumps(asdict(summary), indent=2) + "\n")
     return summary
