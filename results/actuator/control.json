@@ -1,0 +1,142 @@
+{
+  "sea": {
+    "ratio": 75.0,
+    "stiffness": 1081.4837471201986,
+    "reflected_inertia": 0.1018125,
+    "reflected_damping": 0.07593749999999999,
+    "locked_resonance_hz": 16.40323773967154,
+    "eta": 0.85
+  },
+  "controller": {
+    "kp": 0.4866229485358753,
+    "ki": 37.362909870226424,
+    "kd": 0.016492021319724826,
+    "period": 0.001,
+    "d_filter_hz": 100.0,
+    "current_bw_hz": 1000.0,
+    "model_feedforward": true,
+    "computation_delay": true
+  },
+  "design_natural_frequency_hz": 20.0,
+  "candidates": [
+    {
+      "design_hz": 20.0,
+      "bandwidth_hz": 28.754604983323958,
+      "rms_error_nm": 0.21033093890475843,
+      "rms_error_pct_peak": 1.5457933883644859,
+      "small_signal_ok": true
+    },
+    {
+      "design_hz": 25.0,
+      "bandwidth_hz": 46.79942921312204,
+      "rms_error_nm": 0.19378395971340456,
+      "rms_error_pct_peak": 1.4241840275895512,
+      "small_signal_ok": true
+    },
+    {
+      "design_hz": 30.0,
+      "bandwidth_hz": 62.749384098135536,
+      "rms_error_nm": 0.16834842449381904,
+      "rms_error_pct_peak": 1.2372496546595122,
+      "small_signal_ok": true
+    },
+    {
+      "design_hz": 35.0,
+      "bandwidth_hz": 75.69594938018085,
+      "rms_error_nm": 0.1333971060035744,
+      "rms_error_pct_peak": 0.9803805638915288,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 40.0,
+      "bandwidth_hz": 81.85256125278147,
+      "rms_error_nm": 0.0999769969300644,
+      "rms_error_pct_peak": 0.7347648503248028,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 45.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 1.921411107214573,
+      "rms_error_pct_peak": 14.121101732956602,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 50.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 2.335351163740893,
+      "rms_error_pct_peak": 17.163287565861335,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 55.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 2.7854320578076046,
+      "rms_error_pct_peak": 20.471084668371958,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 60.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 3.275179181807108,
+      "rms_error_pct_peak": 24.070402344559195,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 65.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 3.9710775710101145,
+      "rms_error_pct_peak": 29.184795569849772,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 70.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 4.5139254271286,
+      "rms_error_pct_peak": 33.174368531608685,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 75.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 5.719288936112,
+      "rms_error_pct_peak": 42.03299366999627,
+      "small_signal_ok": false
+    },
+    {
+      "design_hz": 80.0,
+      "bandwidth_hz": NaN,
+      "rms_error_nm": 6.0711169640580325,
+      "rms_error_pct_peak": 44.61869714411313,
+      "small_signal_ok": false
+    }
+  ],
+  "bandwidth_hz": {
+    "feedback_static_ff": 28.754604983323958,
+    "with_model_ff": 133.51222294581407,
+    "large_signal_saturated": 28.754604983323944
+  },
+  "saturation_onset_hz": NaN,
+  "saturation_checked_up_to_hz": 200.0,
+  "tracking": {
+    "rms_error_nm": 0.21033093890475843,
+    "rms_error_pct_peak": 1.5457933883644859,
+    "rms_error_without_model_ff_nm": 1.8705732069145917,
+    "peak_torque_nm": 13.60666570888218,
+    "peak_current_a": 11.423829595184598,
+    "peak_voltage_v": 11.392035826280466,
+    "current_clipped_fraction": 0.0,
+    "voltage_clipped_fraction": 0.0
+  },
+  "fit": {
+    "time_constant_s": 0.0,
+    "delay_s": 0.001,
+    "rms_error_nm": 0.2091848512841175,
+    "step_rms_error_nm": 1.0473156287128784
+  },
+  "fit_without_model_ff": {
+    "time_constant_s": 0.0032570206556597828,
+    "delay_s": 0.008,
+    "rms_error_nm": 1.1619788621820317
+  }
+}

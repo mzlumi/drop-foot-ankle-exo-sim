@@ -1,0 +1,6 @@
+{
+  "delay_s": 0.008,
+  "time_constant_s": 0.00326,
+  "limit_nm": 13.61,
+  "source": "analysis/part_e.py: fit to the closed-loop tracking of the Part C requirement, static feedforward"
+}
