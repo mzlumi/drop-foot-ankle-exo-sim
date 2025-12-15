@@ -1,0 +1,38 @@
+[
+  {
+    "run_id": "261006.134127.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R1",
+    "seed": 1,
+    "generations": 149,
+    "best_cost": 0.572,
+    "best_generation": 105,
+    "best_par": "0105_5.033_0.572.par",
+    "best_cost_window_start": 0.572,
+    "rel_improvement_window": 0.0,
+    "converged": true,
+    "init_file": "../../results/dropfoot_ta25/seed1/best.par"
+  },
+  {
+    "run_id": "261006.134136.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R2",
+    "seed": 2,
+    "generations": 149,
+    "best_cost": 0.565,
+    "best_generation": 129,
+    "best_par": "0129_3.638_0.565.par",
+    "best_cost_window_start": 0.569,
+    "rel_improvement_window": 0.007029876977152906,
+    "converged": true,
+    "init_file": "../../results/dropfoot_ta25/seed2/best.par"
+  },
+  {
+    "run_id": "261006.134142.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R3",
+    "seed": 3,
+    "generations": 149,
+    "best_cost": 0.553,
+    "best_generation": 145,
+    "best_par": "0145_0.571_0.553.par",
+    "best_cost_window_start": 0.567,
+    "rel_improvement_window": 0.024691358024691187,
+    "converged": false,
+    "init_file": "../../results/dropfoot_ta25/seed3/best.par"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "run_id": "261006.131338.f0914m.GH2010v8asym.SC.S12W.D10.passive_ta25_k160.I.R1",
+    "seed": 1,
+    "generations": 149,
+    "best_cost": 0.712,
+    "best_generation": 134,
+    "best_par": "0134_28.174_0.712.par",
+    "best_cost_window_start": 6.416,
+    "rel_improvement_window": 0.8890274314214465,
+    "converged": false,
+    "init_file": "../../results/dropfoot_ta25/seed1/best.par"
+  },
+  {
+    "run_id": "261006.131347.f0914m.GH2010v8asym.SC.S12W.D10.passive_ta25_k160.I.R2",
+    "seed": 2,
+    "generations": 149,
+    "best_cost": 0.548,
+    "best_generation": 133,
+    "best_par": "0133_0.556_0.548.par",
+    "best_cost_window_start": 0.555,
+    "rel_improvement_window": 0.012612612612612623,
+    "converged": false,
+    "init_file": "../../results/dropfoot_ta25/seed2/best.par"
+  },
+  {
+    "run_id": "261006.131354.f0914m.GH2010v8asym.SC.S12W.D10.passive_ta25_k160.I.R3",
+    "seed": 3,
+    "generations": 149,
+    "best_cost": 0.652,
+    "best_generation": 108,
+    "best_par": "0108_18.519_0.652.par",
+    "best_cost_window_start": 0.652,
+    "rel_improvement_window": 0.0,
+    "converged": true,
+    "init_file": "../../results/dropfoot_ta25/seed3/best.par"
+  }
+]

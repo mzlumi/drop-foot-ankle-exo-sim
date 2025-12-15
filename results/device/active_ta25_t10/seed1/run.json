@@ -1,0 +1,12 @@
+{
+  "run_id": "261006.134127.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R1",
+  "seed": 1,
+  "generations": 149,
+  "best_cost": 0.572,
+  "best_generation": 105,
+  "best_par": "0105_5.033_0.572.par",
+  "best_cost_window_start": 0.572,
+  "rel_improvement_window": 0.0,
+  "converged": true,
+  "init_file": "../../results/dropfoot_ta25/seed1/best.par"
+}

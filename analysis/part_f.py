@@ -331,7 +331,8 @@ def cmd_compare(level: float, workers: int) -> None:
         ax.set_xlabel("Right gait cycle (%)", fontsize=8)
         ax.tick_params(labelsize=8)
     axes[0, 0].legend(fontsize=6)
-    for ax, key, label in ((axes[1, 1], TOE, "Min toe clearance (mm)"), (axes[1, 2], PUSHOFF, "Peak push-off power (W)")):
+    for ax, key, label in ((axes[1, 1], TOE, "Min toe clearance (mm); dotted: healthy - 10 mm"),
+                           (axes[1, 2], PUSHOFF, "Peak push-off power, muscles + device (W)")):
         for i, g in enumerate(groups):
             w = sub[g][sub[g].walks][key].dropna()
             fell = int((~sub[g].walks).sum())
@@ -344,7 +345,8 @@ def cmd_compare(level: float, workers: int) -> None:
             ax.axhline(healthy_toe - 10.0, color="k", ls=":", lw=0.8)
         ax.set_xticks(range(len(groups)))
         ax.set_xticklabels(["H"] + [f"{d[0].upper()}{st[0]}" for d, st in groups[1:]], fontsize=8)
-        ax.set_title(label + "; N/P/A = none/passive/active, f/r = frozen/re-opt.", fontsize=8)
+        ax.set_title(label, fontsize=9)
+        ax.set_xlabel("H healthy; N/P/A no device/passive/active; f/r frozen/re-optimized", fontsize=7)
     fig.suptitle(f"Drop foot at {100 * level:g}% tibialis anterior strength: devices, frozen (dashed) and re-optimized controllers", fontsize=10)
     fig.tight_layout()
     fig.savefig(FIGURE, dpi=150)
