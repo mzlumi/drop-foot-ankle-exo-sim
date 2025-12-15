@@ -1,0 +1,12 @@
+{
+  "run_id": "261006.083112.f0914m.GH2010v8asym.S12W.D10.ta50.I.R2",
+  "seed": 2,
+  "generations": 149,
+  "best_cost": 0.7,
+  "best_generation": 103,
+  "best_par": "0103_60.051_0.700.par",
+  "best_cost_window_start": 0.7,
+  "rel_improvement_window": 0.0,
+  "converged": true,
+  "init_file": "../results/healthy/seed2/healthy_asym.par"
+}
