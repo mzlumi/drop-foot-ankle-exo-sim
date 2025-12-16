@@ -1,0 +1,76 @@
+\subsection{Healthy baseline}\label{sec:res-healthy}
+The three healthy seeds converged to nearly the same gait (costs 0.5447 to 0.5467, Fig.~\ref{fig:healthy}): \SI{1.16}{m/s}, stride \SI{1.36}{s} and \SI{1.57}{m}, stance 61.7\% of the cycle against $60.3 \pm 1.0\%$ in the data, and a cost of transport of \SI{5.46}{J/(kg.m)}. Shapes agree well ($r = 0.95$ to 0.97 for hip and knee angles, ankle moment and vertical force, 0.96 for the shank angular velocity that the detector uses, 0.83 for the ankle angle). The largest error is a constant hip offset of \SI{+19}{\degree} (RMSE \SI{7}{\degree} without it): the model walks with its pelvis tilted forward by \SI{13}{\degree}. The stance knee extends fully in mid stance, and the ankle drops from 0 to \SI{-20}{\degree} within 3\% of the cycle after heel strike (peak plantarflexion velocity \SI{780}{\degree/s}, impact peak 1.55 body weights): the optimized healthy model already has little eccentric control of the foot at loading. Foot slap in drop foot is therefore judged against this model value. Mid-swing toe clearance is \SI{36}{mm}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{healthy_vs_normative.png}
+\caption{Healthy model (three seeds) against the Camargo et al.\ \cite{camargo2021} mean and SD at 1.2~m/s, right stride.}
+\label{fig:healthy}
+\end{figure}
+
+\subsection{Drop foot}
+\emph{Immediate effect.} With the healthy controller unchanged, the model falls at every strength from 10 to 90\%, in all three seeds, within 1.3 to 1.6~s below 90\%. It trips: at 50\% the right foot touches the ground 0.20~s after toe-off. The weakest strength that still walks 10~s is 96.3 to 98.8\% depending on the seed. The healthy gait is an effort optimum with no reserve (peak swing TA activation 0.15), so no immediate-effect gait metrics exist.
+
+\emph{Adapted gait.} After re-optimization all three seeds walk at every strength (Table~\ref{tab:dropfoot}, Fig.~\ref{fig:dropfoot}). The 10\% seeds needed the longest search: after 150 generations only one walked, and after 300 to 410 all three did, with costs (0.563 to 0.589) as low as at 25\% (0.590 to 0.695). One seed at 50\% ended 1.3\% better over its last 40 generations, just above the convergence criterion. The adapted model shows the clinical picture of drop foot: the ankle hangs 15 to \SI{30}{\degree} plantarflexed in mid swing and lands plantarflexed, and the leg is lifted more, mainly at the hip (steppage of +6 to \SI{+11}{\degree}) and less at the knee (+3 to \SI{+4}{\degree}). The weak TA is activated more (swing peaks of about 0.2, 0.45 and 0.6 against 0.15). The compensation overshoots: mid-swing toe clearance is 9 to 20~mm \emph{above} healthy. The cost of transport rises by 5 to 11\%, push-off power is unchanged within the seed spread, and foot slap rises only by 5 to 11\% because the healthy model already slaps. The CMU 2D model at 33\% strength \cite{dermksian} walked at \SI{0.65}{m/s} with an exaggerated knee lift; here the stride is longer and faster (\SI{1.77}{m} in \SI{1.38}{s} at 25\%) because the objective penalizes walking below \SI{1.2}{m/s}, and the extra lift is mostly at the hip.
+
+\begin{table}[t]
+\centering
+\caption{Right-side metrics of the adapted gaits, mean $\pm$ SD over three seeds (all walk).}
+\label{tab:dropfoot}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\toprule
+Metric & Healthy & 50\% & 25\% & 10\% \\
+\midrule
+Toe clearance (mm) & $36.3 \pm 0.3$ & $45.5 \pm 1.5$ & $56.5 \pm 4.9$ & $49.9 \pm 8.9$ \\
+Ankle at IC (\si{\degree}) & $0.4 \pm 0.3$ & $-2.8 \pm 5.0$ & $-6.8 \pm 2.5$ & $-8.7 \pm 4.9$ \\
+Swing dorsiflexion (\si{\degree}) & $0.4 \pm 0.3$ & $-2.8 \pm 5.0$ & $-6.7 \pm 2.5$ & $-5.7 \pm 6.5$ \\
+Foot slap (\si{\degree/s}) & $782 \pm 5$ & $871 \pm 71$ & $824 \pm 31$ & $844 \pm 117$ \\
+Steppage, hip (\si{\degree}) & 0 & $+6.0 \pm 2.7$ & $+10.9 \pm 0.9$ & $+9.7 \pm 1.4$ \\
+Steppage, knee (\si{\degree}) & 0 & $+3.0 \pm 1.7$ & $+4.1 \pm 1.6$ & $+2.9 \pm 2.6$ \\
+Push-off power (W) & $126 \pm 1$ & $132 \pm 2$ & $124 \pm 4$ & $122 \pm 9$ \\
+Speed (m/s) & $1.16$ & $1.23$ & $1.28$ & $1.20$ \\
+CoT (J/(kg\,m)) & $5.46$ & $5.87$ & $6.05$ & $5.71$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{dropfoot_overlay.png}
+\caption{Right-leg curves of the healthy and adapted drop-foot gaits, mean over seeds with the range as a band; dashed lines mark toe-off.}
+\label{fig:dropfoot}
+\end{figure}
+
+\subsection{Actuator sizing}
+The TA deficit at 25\% strength has two parts (Fig.~\ref{fig:actuator}a): braking the foot after heel strike, with the peak requirement of \SI{13.6}{N.m} at 8\% of the cycle, and lifting it in swing, up to about \SI{7}{N.m}. On the normative trajectory 250 of the 702 designs are feasible (Fig.~\ref{fig:actuator}b). The chosen design is $N = 75$ with $k = \SI{1081}{N.m/rad}$: \SI{6.76}{J} per stride (\SI{6.03}{J} with ideal regeneration), RMS current \SI{1.79}{A}, peak motor speed \SI{301}{rad/s} and peak voltage \SI{11.3}{V}. A rigid drive at the same ratio needs \SI{6.79}{J}, so the spring saves 0.4\%. Series elasticity saves motor work when the spring stores and returns a large share of the joint work, as in push-off assistance \cite{au2008}; a dorsiflexion assist has small torques at large ankle velocities, the spring deflects by a fraction of a degree, and the copper losses depend on torque, not stiffness. The spring is kept for torque sensing and impact tolerance. On the model's own ankle trajectory no design is feasible (lowest RMS current \SI{3.64}{A} against the \SI{3.21}{A} rating), because of the foot slap.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{actuator_requirement.png}\\[2pt]
+\includegraphics[width=\columnwidth]{actuator_sweep.png}
+\caption{(a) TA moment of the healthy and adapted 25\% gaits (three seeds each) and the requirement, 1.2 times the deficit. (b) Electrical energy per stride over gear ratio and series stiffness on the normative ankle trajectory; grey designs exceed a speed, current or voltage limit.}
+\label{fig:actuator}
+\end{figure}
+
+\subsection{Gait-event detection}
+On 127 healthy heel strikes and 129 toe-offs (three 60~s runs) both HS features found every event with no false detection. The \emph{min} feature estimates HS $25.4 \pm 2.9$~ms late, confirmed 37.8~ms after the event; \emph{zero} fires $50.6 \pm 1.4$~ms early, before the foot lands. TO is estimated $13.0 \pm 3.0$~ms early. The rule fixed before the results (no missed or false events, then the lower HS mean absolute error) selected \emph{min}; the gait-phase error is $-1.5\%$ mean, 2.4\% RMS of the cycle. The Lua detector and its Python twin agree to $10^{-14}$~s. On the adapted 25\% gait (112 HS and 114 TO; seed 3 falls after 41.5~s of the 60~s run) the detector still found 99\% of the events, with one missed HS and two missed TO, all in one seed. The errors widen: HS with \emph{min} $+23.7 \pm 14.1$~ms and TO $-26.8 \pm 22.0$~ms, phase error 2.8\% RMS. The \emph{zero} feature fails on drop foot, firing 39 to 119~ms early depending on the seed, because the adapted gaits differ in how long the shank keeps swinging before the flat-footed contact. The choice of \emph{min} stands.
+
+Without retuning, on the real shank gyroscopes of 20 Camargo subjects (two rejected because the gyroscope could not be aligned with motion capture), the detector found 535 of 536 heel strikes and 527 of 532 toe-offs, with one false detection each. The HS error with \emph{min} is bimodal, $+12.4 \pm 20.6$~ms: near zero in most subjects, but about $+50$~ms in the two subjects whose gyroscope axis has the opposite sign to the other eighteen (probably mounted differently), where the shallow contact notch is missing and the detector waits for the impact minimum. TO is estimated earlier and with more spread than in simulation ($-40.8 \pm 26.1$~ms). Between-subject variation, absent in a single model, is the main source of error on real data.
+
+\subsection{SEA torque control}
+The locked-output resonance of the chosen SEA is at \SI{16.4}{Hz}. Designs from 20 to \SI{30}{Hz} are stable with little peaking; 35 and \SI{40}{Hz} have more than 6~dB of peaking and from \SI{45}{Hz} the sampled loop is unstable. The selected \SI{20}{Hz} design ($K_p = 0.487$, $K_i = 37.4$, $K_d = 0.0165$, in A per N\,m units) has a \SI{-3}{dB} bandwidth of \SI{28.8}{Hz} with static feedforward and \SI{134}{Hz} with the model feedforward (Fig.~\ref{fig:sea}). At the full \SI{13.6}{N.m} amplitude the current and voltage limits change no gain by more than 1~dB up to \SI{200}{Hz}. It tracks five strides of $\tau_\text{req}$ with an RMS error of \SI{0.21}{N.m} (1.5\% of peak; \SI{1.87}{N.m} without the model feedforward), a peak current of \SI{11.4}{A} and no clipping. Fitted to the loop with static feedforward, the reduced model is an 8~ms delay and a 3.3~ms lag (RMS misfit \SI{1.16}{N.m}); with the model feedforward it is a 1~ms delay and no lag. The simulated device uses the former, which does not assume that the ankle trajectory is known ahead of time.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{sea_bode.png}
+\caption{Closed-loop torque response of the SEA with the output locked: feedback with static feedforward, with the model feedforward, and at the full torque amplitude with current and voltage saturation.}
+\label{fig:sea}
+\end{figure}
+
+\subsection{Device experiment}
+\TBD
+
+\subsection{Robustness}
+\TBD
