@@ -70,7 +70,45 @@ The locked-output resonance of the chosen SEA is at \SI{16.4}{Hz}. Designs from 
 \end{figure}
 
 \subsection{Device experiment}
-\TBD
+\emph{Frozen controllers.} With the adapted reflexes unchanged, no setting of either device let all three seeds walk: every passive stiffness walked in one seed only, and no active swing target in any seed. The completed rule chose $k_\text{AFO} = \SI{160}{N.m/rad}$ and $\theta^* = \SI{10}{\degree}$. A separate check found that the frozen gaits tolerate springs of up to \SI{2.5}{N.m/rad}, while \SI{5}{N.m/rad} (under \SI{2}{N.m} over the ankle's range) already makes two of three seeds fall: the optimized gaits have no reserve for any change at the ankle.
+
+\emph{Re-optimized.} All nine runs walk (Table~\ref{tab:device}, Fig.~\ref{fig:device}). The hypothesis is \textbf{rejected}. Parts 1 and 2 hold: with the active AFO, toe clearance is \SI{50.8}{mm} against a bound of \SI{26.3}{mm}, and push-off power is \SI{133}{W} against \SI{112}{W}. Part 3 fails by more than one seed SD: with the passive AFO the total push-off peak rises to \SI{209}{W} instead of falling below \SI{106}{W}. The spring stores energy as the ankle dorsiflexes in stance and returns it in the first half of push-off, \SI{12}{J} per stride each way, while the muscles' own peak falls by 9\%. The passive AFO does what a stiff orthosis does at loading, halving the foot-slap index to \SI{452}{\degree/s} and landing the foot flat, but leaves toe clearance and most of the steppage unchanged. The active AFO holds the foot at \SI{+3.7}{\degree} at contact and, at the same toe clearance as without a device, lets the re-optimized controller drop most of the compensation: swing hip flexion falls from 56.6 to \SI{50.0}{\degree}, knee flexion returns to its healthy value, and the cost of transport falls by 5\% (5.94 to \SI{5.63}{J/(kg.m)}; healthy 5.46). It works about \SI{4}{J} per stride each way, with peaks at the \SI{13.6}{N.m} actuator limit. Part 1 holds as the decision rule defines it, a lower bound; read as ``within 10~mm'' on both sides, it would be inconclusive (14.5~mm above healthy, a miss of 4.5~mm against a seed SD of 6.3~mm). Four of the nine re-optimizations had not converged at the committed budget of 150 generations.
+
+\begin{table}[t]
+\centering
+\caption{Re-optimized conditions at 25\% TA strength, mean $\pm$ SD over three seeds (all walk). Push-off: peak ankle power, muscles plus device.}
+\label{tab:device}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lcccc}
+\toprule
+Metric & Healthy & No device & Passive & Active \\
+\midrule
+Toe clearance (mm) & $36.3 \pm 0.3$ & $50.8 \pm 12.0$ & $50.8 \pm 5.9$ & $50.8 \pm 6.3$ \\
+Push-off (W) & $126 \pm 1$ & $124 \pm 6$ & $209 \pm 32$ & $133 \pm 2$ \\
+Muscle push-off (W) & $126 \pm 1$ & $124 \pm 6$ & $113 \pm 9$ & $133 \pm 2$ \\
+Ankle at IC (\si{\degree}) & $0.4$ & $-7.3 \pm 3.5$ & $-0.6 \pm 0.6$ & $+3.7 \pm 0.2$ \\
+Foot slap (\si{\degree/s}) & $782$ & $884 \pm 68$ & $452 \pm 28$ & $833 \pm 57$ \\
+Swing hip flexion (\si{\degree}) & $46.3$ & $56.6 \pm 2.3$ & $53.4 \pm 5.4$ & $50.0 \pm 2.3$ \\
+CoT (J/(kg\,m)) & $5.46$ & $5.94 \pm 0.18$ & $6.00 \pm 0.51$ & $5.63 \pm 0.10$ \\
+Device work $\pm$ (J) & & & $12.3/{-12.4}$ & $3.8/{-4.2}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{device_comparison.png}
+\caption{Healthy, and drop foot at 25\% with no device, the passive AFO and the active AFO, frozen (dashed) and re-optimized. Bars: means over the seeds that walk, dots: seeds. The dotted line is the bound of part 1 of the hypothesis.}
+\label{fig:device}
+\end{figure*}
 
 \subsection{Robustness}
-\TBD
+Doubling the gyroscope noise to \SI{1}{\degree/s} changed no detected event, and the active-AFO gaits were identical. Doubling the IMU delay to 30~ms made one of three seeds fall, and so did every other IMU delay between 0 and 45~ms except the nominal 15~ms; above 45~ms two of three fell (Fig.~\ref{fig:robust}). Actuator delays from 0 to 100~ms left two of three seeds walking, with toe clearance rising to \SI{67}{mm} at 100~ms as the swing torque arrives late. Seed 1 falls at every timing other than the nominal one, and seed 2 also at IMU delays of 60~ms and more: a re-optimized gait can be tuned to the exact timing it was optimized with. No condition, including the healthy model, survived a single 0.2~s push of 25~N or more in all three seeds. The time from the push to the fall separates them: after a 25~N backward push the active AFO stayed up \SI{5.3}{s} on average, the passive \SI{4.7}{s}, no device \SI{3.6}{s} and the healthy model \SI{2.5}{s}; forward pushes caused falls within 1 to 3~s in all conditions. At the second speed \TBD.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{robustness.png}
+\caption{Robustness of the re-optimized conditions. Left: active AFO toe clearance against IMU and actuator delay (labels: seeds walking, where not all). Middle: time from a pelvis push to the fall, mean over seeds, 5.5~s if no fall. Right: re-optimized at 1.5~m/s.}
+\label{fig:robust}
+\end{figure*}
