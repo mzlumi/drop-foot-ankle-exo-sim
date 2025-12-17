@@ -25,10 +25,13 @@ ask how the adapted wearer copes with something the optimization did not see.
   constant unchanged).
 * **Pushes.** One horizontal push on the pelvis as in Tutorial 4c
   (0.2 s, at the tutorial's point of application), backwards or forwards,
-  at 4.5 s, of 25 to 150 N, for no device and both AFOs. The largest push
-  survived (10 s without a fall) in every seed is the score. The push lands
-  at a different gait phase in each condition and seed; that is part of the
-  spread, not corrected for.
+  at 4.5 s, of 25 to 150 N, for no device and both AFOs, and for the healthy
+  model as the reference (with a 0 N run that checks the scenario reproduces
+  the healthy gait). Scores: seeds walking 10 s, the largest push survived
+  by every seed, and the time from the push to the fall (5.5 s for a seed
+  that walks to the end), which still separates conditions when every one
+  falls. The push lands at a different gait phase in each condition and
+  seed; that is part of the spread, not corrected for.
 """
 
 from __future__ import annotations
@@ -62,6 +65,7 @@ SPEED_GENERATIONS = 150
 DELAYS_MS = (0, 15, 30, 45, 60, 80, 100)
 PUSH_N = (25, 50, 75, 100, 150)
 PUSH_TIME = 4.5
+MAX_AFTER_PUSH = 10.0 - PUSH_TIME
 TOE = "min_toe_clearance_mm"
 PUSHOFF = "peak_pushoff_power_w"
 COLORS = {"healthy": "k", "none": "tab:red", "passive": "tab:blue", "active": "tab:green"}
@@ -177,7 +181,19 @@ def cmd_evaluate(level: float, workers: int) -> None:
                         active_props(fsm, replace(fit, delay_s=d / 1000)), level)
         for s in SEEDS:
             add(scen, reopt_par(name, s), f"rob_{name}_actdelay{d}_s{s}", test="actuator delay", delay_ms=d, device="active", seed=s)
-    # pushes
+    # pushes, with the healthy model as the reference (its 0 N run checks that the scenario reproduces it)
+    healthy_push = scenario("healthy__push_none", "Healthy, no push (analysis/part_f5.py).", none_props(), level, factor=1.0,
+                            init="../../results/healthy/seed1/best.par")
+    for s in SEEDS:
+        add(healthy_push, ROOT / f"results/healthy/seed{s}/best.par", f"rob_healthy_push_none_s{s}", test="push", device="healthy",
+            direction="none", force_n=0, seed=s)
+    for f in PUSH_N:
+        for sign, direction in ((-1, "backward"), (1, "forward")):
+            scen = scenario(f"healthy__push_{direction}{f}", f"Healthy, {f} N {direction} push (analysis/part_f5.py).", none_props(),
+                            level, extra=push_block(sign * f), factor=1.0, init="../../results/healthy/seed1/best.par")
+            for s in SEEDS:
+                add(scen, ROOT / f"results/healthy/seed{s}/best.par", f"rob_healthy_push_{direction}{f}_s{s}", test="push",
+                    device="healthy", direction=direction, force_n=f, seed=s)
     for device, (name, props) in conds.items():
         for f in PUSH_N:
             for sign, direction in ((-1, "backward"), (1, "forward")):
@@ -192,6 +208,7 @@ def cmd_evaluate(level: float, workers: int) -> None:
             add(scen, OUT / "speed15" / sname / f"seed{s}" / "best.par", f"rob_{sname}_s{s}", test="speed15", device=device, seed=s)
     rows = [row_for(sto, rep, **k) for (sto, rep), k in zip(evaluate_many(jobs, workers), keys)]
     df = pd.DataFrame(rows)
+    df["after_push_s"] = np.where(df.test == "push", np.minimum(df.duration_s - PUSH_TIME, MAX_AFTER_PUSH), np.nan)
     first = ["test", "device", "variant", "delay_ms", "direction", "force_n", "seed", "walks", "duration_s", TOE, PUSHOFF, "speed_mps"]
     df = df[[c for c in first if c in df] + [c for c in df.columns if c not in first]]
     df.to_csv(OUT / "robustness.csv", index=False, float_format="%.6g")
@@ -224,8 +241,15 @@ def summarize_tables(df: pd.DataFrame) -> None:
             lines.append("")
     pu = df[df.test == "push"]
     if len(pu):
-        lines += ["## Pushes on the pelvis at 4.5 s (0.2 s)", "", "Largest push with every seed walking 10 s, and seeds walking per force.", "",
-                  "| device | direction | largest survived (N) | " + " | ".join(f"{f} N" for f in PUSH_N) + " |",
+        base = pu[pu.direction == "none"]
+        if len(base):
+            lines += [f"Healthy reference without a push in the same scenario: {int(base.walks.sum())} / {len(base)} walk, "
+                      f"cost {ms(base.cost)}.", ""]
+        pu = pu[pu.direction != "none"]
+        lines += ["## Pushes on the pelvis at 4.5 s (0.2 s)", "",
+                  "Seeds walking 10 s per force, and the time from the start of the push to the fall, mean over seeds "
+                  f"(a seed that walks to the end counts {MAX_AFTER_PUSH:g} s).", "",
+                  "| device | direction | largest survived by all seeds (N) | " + " | ".join(f"{f} N" for f in PUSH_N) + " |",
                   "|---|---|---|" + "---|" * len(PUSH_N)]
         for (dev, direction), g in pu.groupby(["device", "direction"], sort=False):
             per = g.groupby("force_n").walks.agg(["sum", "size"])
@@ -236,7 +260,9 @@ def summarize_tables(df: pd.DataFrame) -> None:
                     largest = f
                 else:
                     break
-            cells = [f"{int(per.loc[f, 'sum'])} / {int(per.loc[f, 'size'])}" if f in per.index else "n/a" for f in PUSH_N]
+            after = g.groupby("force_n").after_push_s.mean()
+            cells = [f"{int(per.loc[f, 'sum'])} / {int(per.loc[f, 'size'])}, {after.loc[f]:.1f} s" if f in per.index else "n/a"
+                     for f in PUSH_N]
             lines.append(f"| {dev} | {direction} | {largest} | " + " | ".join(cells) + " |")
         lines.append("")
     sp = df[df.test == "speed15"]
@@ -271,14 +297,15 @@ def plot(df: pd.DataFrame) -> None:
     ax.set_title("Active AFO: delay (labels: seeds walking, if not all)", fontsize=9)
     ax.legend(fontsize=7)
     ax = axes[1]
-    pu = df[df.test == "push"]
+    pu = df[(df.test == "push") & (df.direction != "none")]
     for i, (dev, g) in enumerate(pu.groupby("device", sort=False)):
         for j, direction in enumerate(("backward", "forward")):
-            r = g[g.direction == direction].groupby("force_n").walks.mean()
-            ax.plot(r.index * (-1 if direction == "backward" else 1), r.values, "o-" if j else "s-", color=COLORS[dev],
-                    label=dev if j == 0 else None, alpha=0.85)
+            r = g[g.direction == direction].groupby("force_n").after_push_s.mean()
+            x = r.index * (-1 if direction == "backward" else 1) + 3.0 * (i - 1.5)
+            ax.plot(x, r.values, "o-" if j else "s-", color=COLORS[dev], label=dev if j == 0 else None, alpha=0.85, ms=4)
+    ax.axhline(MAX_AFTER_PUSH, color="0.6", lw=0.8, ls=":")
     ax.set_xlabel("Push force (N), - backward, + forward")
-    ax.set_ylabel("Fraction of seeds walking 10 s")
+    ax.set_ylabel(f"Time from push to fall (s), mean over seeds; {MAX_AFTER_PUSH:g} = no fall", fontsize=7)
     ax.set_title("Single 0.2 s push on the pelvis at 4.5 s", fontsize=9)
     ax.legend(fontsize=7)
     ax = axes[2]

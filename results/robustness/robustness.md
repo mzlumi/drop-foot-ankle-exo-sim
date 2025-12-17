@@ -35,15 +35,19 @@ Re-optimized controllers; mean +/- SD over the seeds that walk 10 s. Generated b
 | 80 | 2 / 3 | 56.8 +/- 2.3 | 132 +/- 0.21 |
 | 100 | 2 / 3 | 66.6 +/- 0.72 | 129 +/- 2.8 |
 
+Healthy reference without a push in the same scenario: 3 / 3 walk, cost 0.546 +/- 0.001.
+
 ## Pushes on the pelvis at 4.5 s (0.2 s)
 
-Largest push with every seed walking 10 s, and seeds walking per force.
+Seeds walking 10 s per force, and the time from the start of the push to the fall, mean over seeds (a seed that walks to the end counts 5.5 s).
 
-| device | direction | largest survived (N) | 25 N | 50 N | 75 N | 100 N | 150 N |
+| device | direction | largest survived by all seeds (N) | 25 N | 50 N | 75 N | 100 N | 150 N |
 |---|---|---|---|---|---|---|---|
-| none | backward | 0 | 1 / 3 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 |
-| none | forward | 0 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 |
-| passive | backward | 0 | 2 / 3 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 |
-| passive | forward | 0 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 |
-| active | backward | 0 | 2 / 3 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 |
-| active | forward | 0 | 1 / 3 | 0 / 3 | 0 / 3 | 0 / 3 | 0 / 3 |
+| healthy | backward | 0 | 0 / 3, 2.5 s | 0 / 3, 1.0 s | 0 / 3, 2.7 s | 0 / 3, 2.7 s | 0 / 3, 1.6 s |
+| healthy | forward | 0 | 0 / 3, 1.0 s | 0 / 3, 0.9 s | 0 / 3, 0.9 s | 0 / 3, 0.8 s | 0 / 3, 0.7 s |
+| none | backward | 0 | 1 / 3, 3.6 s | 0 / 3, 1.8 s | 0 / 3, 2.7 s | 0 / 3, 1.8 s | 0 / 3, 1.4 s |
+| none | forward | 0 | 0 / 3, 1.9 s | 0 / 3, 1.2 s | 0 / 3, 0.9 s | 0 / 3, 0.8 s | 0 / 3, 0.8 s |
+| passive | backward | 0 | 2 / 3, 4.7 s | 0 / 3, 2.9 s | 0 / 3, 3.1 s | 0 / 3, 2.5 s | 0 / 3, 3.1 s |
+| passive | forward | 0 | 0 / 3, 1.9 s | 0 / 3, 1.2 s | 0 / 3, 1.0 s | 0 / 3, 0.9 s | 0 / 3, 0.8 s |
+| active | backward | 0 | 2 / 3, 5.3 s | 0 / 3, 4.0 s | 0 / 3, 3.0 s | 0 / 3, 3.3 s | 0 / 3, 2.3 s |
+| active | forward | 0 | 1 / 3, 3.1 s | 0 / 3, 2.5 s | 0 / 3, 1.8 s | 0 / 3, 1.2 s | 0 / 3, 0.8 s |
