@@ -23,13 +23,20 @@ from dropfoot import ROOT
 CAMARGO = ROOT / "data" / "raw" / "camargo"
 STEPS = [
     ("normative", ["analysis/normative.py"], True, "figures/normative_camargo_treadmill_1.20mps.png"),
+    ("sign_check", ["analysis/plot_stride.py", "results/sign_check/tutorial_stride.sto", "figures/sign_check_stride.png"], False,
+     "figures/sign_check_stride.png"),
     ("part_a", ["analysis/part_a.py"], False, "figures/healthy_vs_normative.png"),
+    ("device_check", ["analysis/device_check.py"], False, "results/device_check/summary.json"),
+    ("part_b_immediate", ["analysis/part_b_immediate.py"], False, "results/dropfoot/immediate*.csv"),
     ("part_b_adapted", ["analysis/part_b_adapted.py"], False, "figures/dropfoot_overlay.png"),
     ("part_c", ["analysis/part_c.py"], False, "figures/actuator_{requirement,sweep,torque_speed}.png"),
     ("part_d_validation", ["analysis/part_d_validation.py", "--dropfoot", "0.25"], False, "figures/detector_trace.png"),
     ("part_d_camargo", ["analysis/part_d_camargo.py"], True, "figures/detector_sim_vs_real.png"),
     ("part_e", ["analysis/part_e.py"], False, "figures/sea_{bode,tracking}.png"),
+    ("part_f_frozen", ["analysis/part_f.py", "frozen"], False, "results/device/frozen.csv, selection.json"),
+    ("part_f_soft", ["analysis/part_f.py", "soft"], False, "results/device/frozen_soft_springs.csv"),
     ("part_f", ["analysis/part_f.py", "compare"], False, "figures/device_comparison.png"),
+    ("animation", ["analysis/animate.py"], False, "figures/dropfoot_conditions.gif"),
     ("part_f5", ["analysis/part_f5.py", "evaluate"], False, "figures/robustness.png"),
 ]
 
