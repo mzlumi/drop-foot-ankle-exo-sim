@@ -9,6 +9,7 @@ right strides after the first two (start-up) strides.
 
 from __future__ import annotations
 
+import hashlib
 import math
 from pathlib import Path
 
@@ -27,13 +28,30 @@ MIN_STRIDES = 3
 def evaluate_cached(
     scenario: str | Path, par: str | Path, name: str, overrides: dict | None = None, force: bool = False
 ) -> tuple[Storage, str]:
-    """``.sto`` and objective breakdown of ``par`` in ``scenario``, evaluated at most once per ``name``."""
+    """``.sto`` and objective breakdown of ``par`` in ``scenario``, cached under ``name``.
+
+    The cache entry is reused only while the scenario text, the ``.par`` and
+    the overrides are unchanged (their hash is stored next to it). Files the
+    scenario includes are not hashed.
+    """
     out = EVAL_CACHE / f"{name}.par"
     sto_path = out.with_name(out.name + ".sto")
     report = out.with_name(out.name + ".txt")
-    if force or not sto_path.exists():
+    key_path = out.with_name(out.name + ".key")
+    key = cache_key(scenario, par, overrides)
+    if force or not sto_path.exists() or not key_path.exists() or key_path.read_text() != key:
         scone.evaluate(scenario, par, out, overrides)
+        key_path.write_text(key)
     return read_sto(sto_path), report.read_text()
+
+
+def cache_key(scenario: str | Path, par: str | Path, overrides: dict | None = None) -> str:
+    h = hashlib.sha256()
+    for f in (scenario, par):
+        h.update(Path(f).read_bytes())
+        h.update(b"\0")
+    h.update(repr(sorted((overrides or {}).items())).encode())
+    return h.hexdigest()
 
 
 def evaluate_many(jobs: list[tuple], workers: int = 6) -> list[tuple[Storage, str]]:
