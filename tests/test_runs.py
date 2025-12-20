@@ -54,6 +54,18 @@ def test_curate_copies_the_histories_of_earlier_stages(tmp_path):
     assert not (tmp_path / "out" / "history_stage3.txt").exists()
 
 
+def test_curate_keeps_the_earlier_stage_when_the_continuation_is_worse(tmp_path):
+    runs = tmp_path / "runs" / "c.s1"
+    first = _run(runs / "261006.0700.R1", {0: 2.0, 134: 0.712}, last=149)
+    (first / "0134_0.722_0.712.par").write_text("p 1 1 0.2\n")
+    second = _run(runs / "261006.0900.R1", {0: 6.8, 133: 0.718}, last=139)
+    (second / "config.scone").write_text(f'\tinit_file = "../results/raw/runs/c.s1/{first.name}/0134_0.722_0.712.par"\n')
+    s = curate(second, 1, tmp_path / "out")
+    assert (s.best_cost, s.best_generation, s.best_from) == (0.712, 134, first.name)
+    assert s.generations == 139
+    assert (tmp_path / "out" / "best.par").read_text() == "p 1 1 0.2\n"
+
+
 def test_curate_and_latest(tmp_path):
     _run(tmp_path / "runs" / "261006.0700.R1", {0: 1.0}, last=3)
     newer = _run(tmp_path / "runs" / "261006.0800.R1", {0: 0.9, 2: 0.8}, last=3)

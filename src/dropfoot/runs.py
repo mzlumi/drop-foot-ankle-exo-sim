@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -38,6 +38,7 @@ class RunSummary:
     rel_improvement_window: float
     converged: bool
     init_file: str = ""  # warm start; an earlier run's .par for a continuation
+    best_from: str = ""  # run id that best_par is in (an earlier stage if the continuation never beat it)
 
 
 def init_file(run: Path) -> str:
@@ -123,11 +124,23 @@ def curate(run: Path, seed: int, dest: Path) -> RunSummary:
     """Copy the best ``.par`` (as ``best.par``), ``history.txt`` and the run's ``config.scone`` to ``dest``.
 
     For a continuation, the histories of the runs it continues are copied as
-    ``history_stage1.txt``, ``history_stage2.txt``, ... (oldest first).
+    ``history_stage1.txt``, ``history_stage2.txt``, ... (oldest first). A
+    continuation restarts CMA-ES with its initial step size and does not
+    evaluate its start, so it can end worse than the run it continues; the
+    best ``.par`` is therefore the lowest cost over all stages, and
+    ``best_from`` names the run it came from. The convergence fields describe
+    the last stage.
     """
     summary = summarize_run(run, seed)
+    source = run
+    for prev in earlier_stages(run):
+        s = summarize_run(prev, seed)
+        if s.best_cost < summary.best_cost:
+            summary = replace(summary, best_cost=s.best_cost, best_generation=s.best_generation, best_par=s.best_par)
+            source = prev
+    summary = replace(summary, best_from=source.name)
     dest.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(run / summary.best_par, dest / "best.par")
+    shutil.copyfile(source / summary.best_par, dest / "best.par")
     for name in ("history.txt", "config.scone"):
         if (run / name).exists():
             shutil.copyfile(run / name, dest / name)

@@ -8,5 +8,6 @@
   "best_cost_window_start": 0.552,
   "rel_improvement_window": 0.0,
   "converged": true,
-  "init_file": "../../results/raw/runs/active_ta25_t10.s3/261006.134142.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R3/0145_0.571_0.553.par"
+  "init_file": "../../results/raw/runs/active_ta25_t10.s3/261006.134142.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R3/0145_0.571_0.553.par",
+  "best_from": "261006.182424.f0914m.GH2010v8asym.SC.S12W.D10.active_ta25_t10.I.R3"
 }
