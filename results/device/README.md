@@ -55,7 +55,7 @@ Convergence: no device converged in all seeds, the active AFO in seeds 1
 and 2 (seed 3: 2.5% over the last 40 generations), the passive AFO in seed 3
 (seed 1 found walking only at generation 134; seed 2: 1.3%). The comparison
 uses the committed equal budget; the unconverged runs are continued
-separately as a sensitivity check.
+separately as a sensitivity check (below).
 
 | Metric | Healthy | No device | Passive AFO k160 | Active AFO 10 deg |
 |---|---|---|---|---|
@@ -102,3 +102,27 @@ With the active AFO the re-optimized controller drops most of the steppage
 compensation, and push-off is unchanged. Foot slap is not reduced (833 deg/s):
 the braking phase is short and limited by the actuator. The device works
 about 4 J per stride each way.
+
+## Sensitivity: converged re-optimizations
+
+The three re-optimizations that had not converged were continued from their
+best .par (150 generations, stopped once converged) and curated into
+`results/device_converged/`. `analysis/part_f.py converged` recomputes the
+verdict with each replaced by the better of the run and its continuation:
+
+| Part | Committed | Converged |
+|---|---|---|
+| 1. Active toe clearance (mm) | 50.8, holds | 50.8, holds |
+| 2. Active push-off (W) | 132.7, holds | 131.0, holds |
+| 3. Passive push-off (W) | 208.9, fails | 207.7, fails |
+
+The verdict stays rejected. Costs: passive seed 2 0.548 to 0.531, active
+seed 3 0.553 to 0.552. Passive seed 1 never beat its start: a continuation
+restarts CMA-ES with its full step size and does not evaluate its start, and
+it converged at 0.718 against 0.712. It was first curated anyway, because
+curation read only the last stage, and the check then reused a cached
+simulation of the old file, because the cache was keyed on the name only;
+both were fixed in their own commits, and the table above is after the
+fixes. Active seed 3 reports its best at generation 63 of 59: the run was
+stopped after it wrote the generation 63 .par and before the next history
+flush. Details in `converged_check.md` and `converged_check.csv`.
