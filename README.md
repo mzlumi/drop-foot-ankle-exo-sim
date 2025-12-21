@@ -1,8 +1,50 @@
 # Drop-Foot Gait and an IMU-Triggered Ankle Exoskeleton in a Neuromuscular Simulation
 
-A reflex-controlled walking model (Geyer and Herr 2010, in SCONE) is given unilateral drop foot by weakening tibialis anterior. An ankle exoskeleton is then sized, given a low-level torque controller, and triggered by gait events detected from a simulated shank gyroscope with realistic noise, bias and delay. The project tests a stated hypothesis by comparing no device, a passive ankle-foot orthosis (AFO) and a phase-based active AFO, across several optimization seeds and with and without the model adapting to the device.
+![Healthy and drop-foot gait with no device, a passive and an active AFO](figures/device_comparison.png)
 
-The full specification is [`docs/assignment.md`](docs/assignment.md). It combines tasks from the five courses below into one project.
+A reflex-controlled walking model (Geyer and Herr 2010, in SCONE) with a weak right tibialis anterior walks with the steppage gait of drop foot once its controller re-optimizes, and an ankle exoskeleton for it was sized, given a torque controller and triggered only by gait events from a simulated shank gyroscope. A hypothesis committed before the comparison (the active AFO restores toe clearance without costing push-off, the best passive AFO costs more than 15% of push-off) was rejected over three optimization seeds, because the passive AFO's spring returned energy at push-off instead of resisting it. The active AFO left toe clearance unchanged, since the adapted model already over-compensated, but let the model drop most of its steppage and lowered its cost of transport by 5%.
+
+The full specification is [`docs/assignment.md`](docs/assignment.md). It combines tasks from the five courses below into one project. The report is [`report/main.pdf`](report/main.pdf); an animation of the four conditions is [`figures/dropfoot_conditions.gif`](figures/dropfoot_conditions.gif).
+
+## Results
+
+All numbers are mean +/- SD over three CMA-ES seeds; falls are counted, never averaged. Each part's folder has a README with the details.
+
+- **Healthy model** ([`results/healthy`](results/healthy), [`results/normative`](results/normative)). Three seeds converge to the same gait: 1.16 m/s, stride 1.36 s, r = 0.95 to 0.97 against Camargo et al. (2021) hip, knee, ankle moment and vertical force curves; a constant 19 degree hip offset from a forward-tilted pelvis.
+- **Drop foot** ([`results/dropfoot`](results/dropfoot)). With the healthy controller the model falls at every strength below 96 to 99%. Re-optimized, it walks at 50, 25 and 10% in every seed, with steppage (+6 to +11 degrees of swing hip flexion), a plantarflexed foot in swing and at contact, toe clearance 9 to 20 mm *above* healthy, and 5 to 11% higher cost of transport.
+- **Actuator** ([`results/actuator`](results/actuator)). Requirement 13.6 N m peak. maxon EC 45 flat with N = 75 and k = 1081 N m/rad, 6.76 J per stride; the spring saves only 0.4% against a rigid drive. The SEA controller at 20 Hz gives 28.8 Hz bandwidth and 1.5% RMS tracking error; the simulated device uses an 8 ms delay plus 3.3 ms lag fit.
+- **Event detector** ([`results/detector`](results/detector)). On simulated healthy gait every event is found (heel strike +25 +/- 3 ms); on adapted drop foot 99% (+24 +/- 14 ms); on the real shank gyroscopes of 20 Camargo subjects, unchanged, 99.8% of heel strikes and 99% of toe-offs.
+- **Device experiment** ([`results/device`](results/device)). Frozen reflexes cannot wear either device (even a 5 N m/rad spring makes them fall). Re-optimized, all conditions walk; the verdict table is below.
+- **Robustness** ([`results/robustness`](results/robustness)). Doubled gyroscope noise changes nothing; one active seed falls at any IMU or actuator delay other than the nominal one; every gait, healthy included, falls after a 25 N push, the active AFO latest. SPEED_RESULT
+
+| Hypothesis part | Threshold | Value | Result |
+|---|---|---|---|
+| 1. Active AFO toe clearance >= healthy - 10 mm | 26.3 mm | 50.8 +/- 6.3 mm | holds |
+| 2. Active AFO push-off >= 90% of no device | 111.8 W | 132.7 +/- 2.1 W | holds |
+| 3. Passive AFO push-off < 85% of no device | 105.5 W | 208.9 +/- 32.4 W | fails: **rejected** |
+
+## What did not work
+
+- **The primary metric.** Toe clearance did not separate the devices: the adapted model already lifted its toe higher than healthy by lifting its hip, and all three re-optimized conditions ended at the same mean clearance. The device's effect showed in the steppage and the cost of transport instead. The one-sided threshold in the decision rule also does not match the "within 10 mm" wording of the hypothesis (read two-sided, part 1 would be inconclusive).
+- **The passive AFO's expected cost.** The hypothesis assumed a passive AFO resists push-off. A 160 N m/rad spring at neutral 0 stores energy in stance dorsiflexion and returns it in early push-off; total push-off power rose by 70%.
+- **Frozen controllers.** The tuning was meant to pick each device's setting on the frozen drop-foot controllers, but no setting let all seeds walk, and the rule had to be completed (in a separate commit, before the comparison). The optimized gaits have no reserve at all.
+- **Sizing on the model's trajectory.** On the adapted model's own ankle motion, with its 2100 rad/s^2 foot slap, no motor design was feasible; the actuator was sized on the normative trajectory instead.
+- **Convergence in 150 generations.** The 25% and 10% drop-foot runs needed one or two continuations to converge; at 10%, two seeds were still falling after 150 generations. Four of the nine device re-optimizations had not converged at the committed budget.
+- **Engineering detours**, each fixed in its own commit: SCONE copies only the script file into the optimization folder, so the Lua modules had to be bundled into one file; the SEA model feedforward opened a 15 dB notch at the locked resonance until the derivative term was compensated; linear interpolation of gait curves made current chatter; the first frozen active sweep used an actuator fit from unconverged results; the first push score was 0 N for every condition.
+
+## Reproduce
+
+Python 3.12 and the `scone-headless` Docker image of the companion repository ([`results/ENVIRONMENT.md`](results/ENVIRONMENT.md)):
+
+```
+uv venv --python 3.12 .venv && source .venv/bin/activate && uv pip install -e ".[dev]" && pytest
+python scripts/fetch_data.py scone          # SCONE tutorial files at a pinned commit
+python scripts/fetch_camargo.py             # Camargo et al. (2021), see data/README.md
+python analysis/make_figures.py             # every table and figure from the committed .par files
+cd report && latexmk -pdf main.tex
+```
+
+`make_figures.py` re-evaluates the committed `.par` files (no optimization). With `SCONE_HOST=<ssh host>` the SCONE evaluations run on another machine that has the image and a copy of the repository (`scripts/remote.sh <host> push`). Re-running an optimization: `python scripts/run_scone.py optimize <scenario> --seed <s> --generations 150`, then `python analysis/curate_runs.py <condition>`. The steps that need the Camargo data are skipped without it.
 
 **Related repositories.** [scone-pathological-gait](https://github.com/mzlumi/scone-pathological-gait) is the companion repository: the EPFL BIOENG-404 SCONE assignment (healthy gait, heel walking from plantarflexor weakness, toe walking from hyperreflexia, crouch gait). This project reuses its headless SCONE runner and gait analysis code instead of copying them. This repository covers a different impairment (dorsiflexor weakness) and adds what that one does not have: a device, its actuator, an IMU event detector and a controlled experiment. The event detector pairs with [imu-locomotion-gait-phase](https://github.com/mzlumi/imu-locomotion-gait-phase) (gait phase from real wearable IMUs), and the sensor error model with [imu-opensim-validation](https://github.com/mzlumi/imu-opensim-validation) (IMU kinematics against optical motion capture).
 
@@ -134,7 +176,7 @@ Nothing is downloaded into git; `data/raw/` is ignored. Optimized `.par` files a
 | `scenarios/` | SCONE scenario files, one per condition |
 | `scenarios/lua/` | Lua `ScriptController` and `ScriptMeasure` code (gyroscope model, event detector, devices) |
 | `analysis/` | Python scripts that turn simulation results into tables and figures |
-| `actuator/` | Python scripts for actuator sizing and torque control (Parts C and E), and the motor datasheet record |
+| `actuator/` | The motor datasheet record ([`MOTOR.md`](actuator/MOTOR.md)); the sizing and control scripts are `analysis/part_c.py` and `analysis/part_e.py` |
 | `results/` | Optimized `.par` files, small `.sto` exports, result tables and [`ENVIRONMENT.md`](results/ENVIRONMENT.md) |
 | `figures/` | Generated figures |
 | `report/` | The written report |
@@ -146,22 +188,23 @@ Python setup: `uv venv --python 3.12 .venv && source .venv/bin/activate && uv pi
 
 ## Status
 
-- [ ] Package scaffolding, tests and CI; SCONE runner reused from the companion repository
-- [ ] Stride segmentation and clinical gait metrics, with tests on synthetic signals
-- [ ] Normative curves from the Camargo et al. dataset
-- [ ] Part A: healthy baseline over 3 seeds, compared with normative data
-- [ ] Part B: drop-foot model at 50%, 25% and 10% strength, immediate and adapted, with metrics
-- [ ] Part C: torque requirement, motor model and (N, k) actuator sweep
-- [ ] Part D: simulated shank gyroscope and causal event detector, validated on simulated gait
-- [ ] Event detector tested on real shank IMU data (sim-to-real)
-- [ ] Part E: SEA torque controller, bandwidth, saturation and fitted actuator model
-- [ ] Device moment bookkeeping test and passive AFO stiffness sweep
-- [ ] Hypothesis and primary metric committed before the experiment
-- [ ] Phase-based active AFO controller
-- [ ] Part F: experiment over all conditions, both adaptation modes and 3 seeds
-- [ ] Robustness tests and the delay-sensitivity curve
-- [ ] Figures from one command, side-by-side video of the three drop-foot conditions, report
-- [ ] Final README with results and a "what did not work" section
+- [x] Package scaffolding, tests and CI; SCONE runner reused from the companion repository
+- [x] Stride segmentation and clinical gait metrics, with tests on synthetic signals
+- [x] Normative curves from the Camargo et al. dataset
+- [x] Part A: healthy baseline over 3 seeds, compared with normative data
+- [x] Part B: drop-foot model at 50%, 25% and 10% strength, immediate and adapted, with metrics
+- [x] Part C: torque requirement, motor model and (N, k) actuator sweep
+- [x] Part D: simulated shank gyroscope and causal event detector, validated on simulated gait
+- [x] Event detector tested on real shank IMU data (sim-to-real)
+- [x] Part E: SEA torque controller, bandwidth, saturation and fitted actuator model
+- [x] Device moment bookkeeping test and passive AFO stiffness sweep
+- [x] Hypothesis and primary metric committed before the experiment
+- [x] Phase-based active AFO controller
+- [x] Part F: experiment over all conditions, both adaptation modes and 3 seeds
+- [x] Robustness tests and the delay-sensitivity curve
+- [x] Figures from one command, an animation of the drop-foot conditions, report
+- [x] Final README with results and a "what did not work" section
+- [ ] Before making the repository public: delete `docs/source/` in its own commit
 
 ## Credit
 
