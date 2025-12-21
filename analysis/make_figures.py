@@ -36,6 +36,7 @@ STEPS = [
     ("part_f_frozen", ["analysis/part_f.py", "frozen"], False, "results/device/frozen.csv, selection.json"),
     ("part_f_soft", ["analysis/part_f.py", "soft"], False, "results/device/frozen_soft_springs.csv"),
     ("part_f", ["analysis/part_f.py", "compare"], False, "figures/device_comparison.png"),
+    ("part_f_converged", ["analysis/part_f.py", "converged"], False, "results/device/converged_check.md"),
     ("animation", ["analysis/animate.py"], False, "figures/dropfoot_conditions.gif"),
     ("part_f5", ["analysis/part_f5.py", "evaluate"], False, "figures/robustness.png"),
 ]
