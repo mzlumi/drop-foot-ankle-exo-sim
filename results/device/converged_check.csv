@@ -2,7 +2,7 @@ condition,device,seed,source,walks,cost,min_toe_clearance_mm,peak_pushoff_power_
 none_ta25,none,1,reopt,True,0.588614,43.0303,126.416
 none_ta25,none,2,reopt,True,0.614419,64.3481,117.088
 none_ta25,none,3,reopt,True,0.580151,45.1435,129.023
-passive_ta25_k160,passive,1,converged,True,0.717889,58.3705,282.049
+passive_ta25_k160,passive,1,converged,True,0.711934,57.0836,221.089
 passive_ta25_k160,passive,2,converged,True,0.53127,40.183,168.54
 passive_ta25_k160,passive,3,reopt,True,0.652235,49.9895,233.48
 active_ta25_t10,active,1,reopt,True,0.571713,43.6076,134.85
