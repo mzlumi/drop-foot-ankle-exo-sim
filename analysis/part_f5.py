@@ -16,6 +16,11 @@ ask how the adapted wearer copes with something the optimization did not see.
   the tutorial's 1.5 m/s initial state the 1.2 m/s controllers fall within
   1.3 s, so the optimization would start from falls instead of from a gait
   that walks and only has to speed up.
+  Every run gets 150 generations and is then continued from its best .par
+  in stages of 150 while it has not converged or still falls, up to three
+  stages (450 generations), the same for every condition. A falling run can
+  meet the convergence criterion when CMA-ES stalls, and a continuation
+  restarts the step size, which is how several runs found a gait late.
   Curated results go to results/robustness/speed15/<condition>/seed<i>/.
 * **IMU noise and delay.** The active AFO with the gyroscope noise doubled
   (0.5 to 1.0 deg/s RMS), the delay doubled (15 to 30 ms), and both. The
