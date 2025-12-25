@@ -1,0 +1,13 @@
+{
+  "run_id": "261006.112801.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R2",
+  "seed": 2,
+  "generations": 149,
+  "best_cost": 0.616,
+  "best_generation": 101,
+  "best_par": "0101_10.848_0.616.par",
+  "best_cost_window_start": 0.616,
+  "rel_improvement_window": 0.0,
+  "converged": true,
+  "init_file": "../../results/healthy/seed2/best.par",
+  "best_from": "261006.112801.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R2"
+}

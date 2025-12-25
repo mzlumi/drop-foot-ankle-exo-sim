@@ -1,0 +1,41 @@
+[
+  {
+    "run_id": "261007.040458.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R1",
+    "seed": 1,
+    "generations": 149,
+    "best_cost": 13.592,
+    "best_generation": 124,
+    "best_par": "0124_15.523_13.592.par",
+    "best_cost_window_start": 13.644,
+    "rel_improvement_window": 0.003811199061858663,
+    "converged": true,
+    "init_file": "../../results/raw/runs/passive_ta25_k160_speed15.s1/261006.233350.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R1/0117_16.153_13.773.par",
+    "best_from": "261007.040458.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R1"
+  },
+  {
+    "run_id": "261007.010007.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R2",
+    "seed": 2,
+    "generations": 149,
+    "best_cost": 0.581,
+    "best_generation": 107,
+    "best_par": "0107_5.909_0.581.par",
+    "best_cost_window_start": 0.581,
+    "rel_improvement_window": 0.0,
+    "converged": true,
+    "init_file": "../../results/raw/runs/passive_ta25_k160_speed15.s2/261006.182347.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R2/0137_0.692_0.645.par",
+    "best_from": "261007.010007.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R2"
+  },
+  {
+    "run_id": "261007.040505.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R3",
+    "seed": 3,
+    "generations": 149,
+    "best_cost": 15.264,
+    "best_generation": 140,
+    "best_par": "0140_21.606_15.264.par",
+    "best_cost_window_start": 15.727,
+    "rel_improvement_window": 0.029439816875437206,
+    "converged": false,
+    "init_file": "../../results/raw/runs/passive_ta25_k160_speed15.s3/261006.233354.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R3/0061_22.935_16.291.par",
+    "best_from": "261007.040505.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R3"
+  }
+]

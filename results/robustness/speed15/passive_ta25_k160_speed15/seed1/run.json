@@ -1,0 +1,13 @@
+{
+  "run_id": "261007.040458.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R1",
+  "seed": 1,
+  "generations": 149,
+  "best_cost": 13.592,
+  "best_generation": 124,
+  "best_par": "0124_15.523_13.592.par",
+  "best_cost_window_start": 13.644,
+  "rel_improvement_window": 0.003811199061858663,
+  "converged": true,
+  "init_file": "../../results/raw/runs/passive_ta25_k160_speed15.s1/261006.233350.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R1/0117_16.153_13.773.par",
+  "best_from": "261007.040458.f0914m.GH2010v8asym.SC.S15W.D10.passive_ta25_k160_speed15.I.R1"
+}

@@ -1,0 +1,13 @@
+{
+  "run_id": "261006.150954.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R3",
+  "seed": 3,
+  "generations": 149,
+  "best_cost": 0.598,
+  "best_generation": 74,
+  "best_par": "0074_6.443_0.598.par",
+  "best_cost_window_start": 0.598,
+  "rel_improvement_window": 0.0,
+  "converged": true,
+  "init_file": "../../results/raw/runs/healthy_speed15.s3/261006.112809.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R3/0114_9.549_0.607.par",
+  "best_from": "261006.150954.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R3"
+}

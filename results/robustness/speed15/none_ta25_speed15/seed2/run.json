@@ -1,0 +1,13 @@
+{
+  "run_id": "261006.233315.f0914m.GH2010v8asym.SC.S15W.D10.none_ta25_speed15.I.R2",
+  "seed": 2,
+  "generations": 149,
+  "best_cost": 0.736,
+  "best_generation": 55,
+  "best_par": "0055_9.496_0.736.par",
+  "best_cost_window_start": 0.736,
+  "rel_improvement_window": 0.0,
+  "converged": true,
+  "init_file": "../../results/raw/runs/none_ta25_speed15.s2/261006.182329.f0914m.GH2010v8asym.SC.S15W.D10.none_ta25_speed15.I.R2/0140_25.038_6.065.par",
+  "best_from": "261006.233315.f0914m.GH2010v8asym.SC.S15W.D10.none_ta25_speed15.I.R2"
+}

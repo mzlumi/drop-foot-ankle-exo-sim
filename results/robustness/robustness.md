@@ -51,3 +51,12 @@ Seeds walking 10 s per force, and the time from the start of the push to the fal
 | passive | forward | 0 | 0 / 3, 1.9 s | 0 / 3, 1.2 s | 0 / 3, 1.0 s | 0 / 3, 0.9 s | 0 / 3, 0.8 s |
 | active | backward | 0 | 2 / 3, 5.3 s | 0 / 3, 4.0 s | 0 / 3, 3.0 s | 0 / 3, 3.3 s | 0 / 3, 2.3 s |
 | active | forward | 0 | 1 / 3, 3.1 s | 0 / 3, 2.5 s | 0 / 3, 1.8 s | 0 / 3, 1.2 s | 0 / 3, 0.8 s |
+
+## Second speed (MeasureGait15)
+
+| condition | walking | speed (m/s) | toe clearance (mm) | push-off (W) | cost of transport |
+|---|---|---|---|---|---|
+| healthy | 3 / 3 | 1.47 +/- 0.02 | 53.8 +/- 3.6 | 126 +/- 1.8 | 6.01 +/- 0.14 |
+| none | 3 / 3 | 1.49 +/- 0.055 | 56.3 +/- 7.7 | 150 +/- 6.3 | 6.41 +/- 0.25 |
+| passive | 3 / 3 | 1.38 +/- 0.067 | 49.4 +/- 8.2 | 319 +/- 33 | 6.27 +/- 0.47 |
+| active | 3 / 3 | 1.49 +/- 0.017 | 53 +/- 1.1 | 152 +/- 12 | 6.19 +/- 0.089 |

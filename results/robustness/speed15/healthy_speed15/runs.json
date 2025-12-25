@@ -1,0 +1,41 @@
+[
+  {
+    "run_id": "261006.182427.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R1",
+    "seed": 1,
+    "generations": 149,
+    "best_cost": 0.588,
+    "best_generation": 146,
+    "best_par": "0146_5.777_0.588.par",
+    "best_cost_window_start": 0.593,
+    "rel_improvement_window": 0.008431703204047226,
+    "converged": true,
+    "init_file": "../../results/raw/runs/healthy_speed15.s1/261006.150947.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R1/0139_0.732_0.722.par",
+    "best_from": "261006.182427.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R1"
+  },
+  {
+    "run_id": "261006.112801.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R2",
+    "seed": 2,
+    "generations": 149,
+    "best_cost": 0.616,
+    "best_generation": 101,
+    "best_par": "0101_10.848_0.616.par",
+    "best_cost_window_start": 0.616,
+    "rel_improvement_window": 0.0,
+    "converged": true,
+    "init_file": "../../results/healthy/seed2/best.par",
+    "best_from": "261006.112801.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R2"
+  },
+  {
+    "run_id": "261006.150954.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R3",
+    "seed": 3,
+    "generations": 149,
+    "best_cost": 0.598,
+    "best_generation": 74,
+    "best_par": "0074_6.443_0.598.par",
+    "best_cost_window_start": 0.598,
+    "rel_improvement_window": 0.0,
+    "converged": true,
+    "init_file": "../../results/raw/runs/healthy_speed15.s3/261006.112809.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R3/0114_9.549_0.607.par",
+    "best_from": "261006.150954.f0914m.GH2010v8.SC.S15W.D10.healthy_speed15.I.R3"
+  }
+]
