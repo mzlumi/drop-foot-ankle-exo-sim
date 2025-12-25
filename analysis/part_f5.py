@@ -44,6 +44,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 from dataclasses import replace
 
 import matplotlib
@@ -145,6 +146,8 @@ def cmd_speed_runs(level: float) -> None:
 def row_for(sto, report, **keys) -> dict:
     row = summarize(sto, report)
     row.update(keys)
+    m = re.search(r"step_velocity\s*=\s*([-\d.eE+]+)", report)
+    row["scone_step_velocity_mps"] = float(m.group(1)) if m else math.nan
     row["walks"] = is_walking(row)
     if row["walks"]:
         row.update(device_metrics(sto, find_strides(sto, "r", skip_first=2)))
@@ -318,14 +321,17 @@ def plot(df: pd.DataFrame) -> None:
     for i, (dev, g) in enumerate(sp.groupby("device", sort=False)):
         w = g[g.walks]
         if len(w):
-            ax.bar(i, w[TOE].mean(), color=COLORS[dev], alpha=0.7)
-            ax.plot(np.full(len(w), i), w[TOE], "k.")
+            ax.bar(i, w.scone_step_velocity_mps.mean(), color=COLORS[dev], alpha=0.7)
+            ax.plot(np.full(len(w), i), w.scone_step_velocity_mps, "k.")
         if (~g.walks).any():
-            ax.text(i, 1, f"{int((~g.walks).sum())} fell", rotation=90, fontsize=7, ha="center", va="bottom")
+            ax.text(i, 1.21, f"{int((~g.walks).sum())} fell", rotation=90, fontsize=7, ha="center", va="bottom")
+    ax.axhline(1.5, color="k", lw=0.8)
+    ax.axhline(0.95 * 1.5, color="k", lw=0.8, ls=":")
+    ax.set_ylim(1.2, 1.6)
     ax.set_xticks(range(sp.device.nunique()) if len(sp) else [])
     ax.set_xticklabels(list(dict.fromkeys(sp.device)) if len(sp) else [], fontsize=8)
-    ax.set_ylabel("Min toe clearance (mm)")
-    ax.set_title("Re-optimized at 1.5 m/s", fontsize=9)
+    ax.set_ylabel("SCONE step velocity (m/s)")
+    ax.set_title("Re-optimized for 1.5 m/s (dotted: 5% tolerance)", fontsize=9)
     fig.tight_layout()
     fig.savefig(FIGURE, dpi=150)
 
