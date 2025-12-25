@@ -54,9 +54,11 @@ Seeds walking 10 s per force, and the time from the start of the push to the fal
 
 ## Second speed (MeasureGait15)
 
-| condition | walking | speed (m/s) | toe clearance (mm) | push-off (W) | cost of transport |
-|---|---|---|---|---|---|
-| healthy | 3 / 3 | 1.47 +/- 0.02 | 53.8 +/- 3.6 | 126 +/- 1.8 | 6.01 +/- 0.14 |
-| none | 3 / 3 | 1.49 +/- 0.055 | 56.3 +/- 7.7 | 150 +/- 6.3 | 6.41 +/- 0.25 |
-| passive | 3 / 3 | 1.38 +/- 0.067 | 49.4 +/- 8.2 | 319 +/- 33 | 6.27 +/- 0.47 |
-| active | 3 / 3 | 1.49 +/- 0.017 | 53 +/- 1.1 | 152 +/- 12 | 6.19 +/- 0.089 |
+Target met: SCONE's step-averaged shortfall below 1.5 m/s is at most 5% (steps after the two start-up steps). Step velocity is SCONE's distance over time for the same steps; speed and the other metrics are from the strides after the two start-up strides.
+
+| condition | walking | target met | step velocity (m/s) | speed (m/s) | toe clearance (mm) | push-off (W) | cost of transport |
+|---|---|---|---|---|---|---|---|
+| healthy | 3 / 3 | 3 / 3 | 1.44 +/- 0.0088 | 1.47 +/- 0.02 | 53.8 +/- 3.6 | 126 +/- 1.8 | 6.01 +/- 0.14 |
+| none | 3 / 3 | 1 / 3 | 1.44 +/- 0.052 | 1.49 +/- 0.055 | 56.3 +/- 7.7 | 150 +/- 6.3 | 6.41 +/- 0.25 |
+| passive | 3 / 3 | 1 / 3 | 1.36 +/- 0.059 | 1.38 +/- 0.067 | 49.4 +/- 8.2 | 319 +/- 33 | 6.27 +/- 0.47 |
+| active | 3 / 3 | 3 / 3 | 1.45 +/- 0.0081 | 1.49 +/- 0.017 | 53 +/- 1.1 | 152 +/- 12 | 6.19 +/- 0.089 |

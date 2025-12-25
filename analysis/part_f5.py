@@ -11,7 +11,8 @@ ask how the adapted wearer copes with something the optimization did not see.
 * **Speed.** The gait measure only changes the cost, not the dynamics of a
   given controller, so a second speed needs a new optimization: every
   condition (healthy, no device, the chosen passive and active AFO) is
-  re-optimized with MeasureGait15 (at least 1.5 m/s minus the 5% threshold)
+  re-optimized with MeasureGait15 (penalized when the step-averaged shortfall
+  below 1.5 m/s exceeds 5%)
   from its 1.2 m/s result. The initial state stays the 1.2 m/s one: with
   the tutorial's 1.5 m/s initial state the 1.2 m/s controllers fall within
   1.3 s, so the optimization would start from falls instead of from a gait
@@ -68,6 +69,7 @@ OUT = ROOT / "results" / "robustness"
 FIGURE = ROOT / "figures" / "robustness.png"
 DEVICE_OUT = ROOT / "results" / "device"
 SPEED_GENERATIONS = 150
+SPEED_TOLERANCE = 0.05
 DELAYS_MS = (0, 15, 30, 45, 60, 80, 100)
 PUSH_N = (25, 50, 75, 100, 150)
 PUSH_TIME = 4.5
@@ -148,6 +150,10 @@ def row_for(sto, report, **keys) -> dict:
     row.update(keys)
     m = re.search(r"step_velocity\s*=\s*([-\d.eE+]+)", report)
     row["scone_step_velocity_mps"] = float(m.group(1)) if m else math.nan
+    # GaitMeasure averages each step's shortfall below min_velocity, so fast
+    # steps do not offset slow ones and the mean velocity alone cannot tell.
+    m = re.search(r"Gait\s*=\s*[-\d.eE+]+\s*<-\s*100 \* \(([-\d.eE+]+)", report)
+    row["scone_speed_shortfall"] = float(m.group(1)) if m else math.nan
     row["walks"] = is_walking(row)
     if row["walks"]:
         row.update(device_metrics(sto, find_strides(sto, "r", skip_first=2)))
@@ -275,11 +281,17 @@ def summarize_tables(df: pd.DataFrame) -> None:
         lines.append("")
     sp = df[df.test == "speed15"]
     if len(sp):
-        lines += ["## Second speed (MeasureGait15)", "", "| condition | walking | speed (m/s) | toe clearance (mm) | push-off (W) | cost of transport |",
-                  "|---|---|---|---|---|---|"]
+        lines += ["## Second speed (MeasureGait15)", "",
+                  "Target met: SCONE's step-averaged shortfall below 1.5 m/s is at most 5% (steps after the two start-up steps). "
+                  "Step velocity is SCONE's distance over time for the same steps; speed and the other metrics are from the strides "
+                  "after the two start-up strides.", "",
+                  "| condition | walking | target met | step velocity (m/s) | speed (m/s) | toe clearance (mm) | push-off (W) | cost of transport |",
+                  "|---|---|---|---|---|---|---|---|"]
         for dev, g in sp.groupby("device", sort=False):
             w = g[g.walks]
-            lines.append(f"| {dev} | {len(w)} / {len(g)} | {ms(w.speed_mps)} | {ms(w[TOE])} | {ms(w[PUSHOFF])} | {ms(w.cost_of_transport)} |")
+            met = int((w.scone_speed_shortfall <= SPEED_TOLERANCE).sum())
+            lines.append(f"| {dev} | {len(w)} / {len(g)} | {met} / {len(g)} | {ms(w.scone_step_velocity_mps)} | {ms(w.speed_mps)} "
+                         f"| {ms(w[TOE])} | {ms(w[PUSHOFF])} | {ms(w.cost_of_transport)} |")
         lines.append("")
     (OUT / "robustness.md").write_text("\n".join(lines))
     print("\n".join(lines))
@@ -322,16 +334,17 @@ def plot(df: pd.DataFrame) -> None:
         w = g[g.walks]
         if len(w):
             ax.bar(i, w.scone_step_velocity_mps.mean(), color=COLORS[dev], alpha=0.7)
-            ax.plot(np.full(len(w), i), w.scone_step_velocity_mps, "k.")
+            met = w.scone_speed_shortfall <= SPEED_TOLERANCE
+            ax.plot(np.full(met.sum(), i), w.scone_step_velocity_mps[met], "ko", ms=4)
+            ax.plot(np.full((~met).sum(), i), w.scone_step_velocity_mps[~met], "ko", ms=4, mfc="w")
         if (~g.walks).any():
             ax.text(i, 1.21, f"{int((~g.walks).sum())} fell", rotation=90, fontsize=7, ha="center", va="bottom")
     ax.axhline(1.5, color="k", lw=0.8)
-    ax.axhline(0.95 * 1.5, color="k", lw=0.8, ls=":")
     ax.set_ylim(1.2, 1.6)
     ax.set_xticks(range(sp.device.nunique()) if len(sp) else [])
     ax.set_xticklabels(list(dict.fromkeys(sp.device)) if len(sp) else [], fontsize=8)
     ax.set_ylabel("SCONE step velocity (m/s)")
-    ax.set_title("Re-optimized for 1.5 m/s (dotted: 5% tolerance)", fontsize=9)
+    ax.set_title("Re-optimized for 1.5 m/s (open: misses target)", fontsize=9)
     fig.tight_layout()
     fig.savefig(FIGURE, dpi=150)
 
