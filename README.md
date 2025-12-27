@@ -204,11 +204,9 @@ Python setup: `uv venv --python 3.12 .venv && source .venv/bin/activate && uv pi
 - [x] Robustness tests and the delay-sensitivity curve
 - [x] Figures from one command, an animation of the drop-foot conditions, report
 - [x] Final README with results and a "what did not work" section
-- [ ] Before making the repository public: delete `docs/source/` in its own commit
-
 ## Credit
 
-The course material in `docs/source/` belongs to the universities and instructors named above: Carnegie Mellon University (Hartmut Geyer), Georgia Tech (Aaron Young and Greg Sawicki), UCLA (Tyler Clites), the University of Utah (Tommaso Lenzi), Stanford University (Scott Delp and the OpenSim team) and the University of Notre Dame (Edgar Bolivar-Nieto). The CMU project report is by Michael Dermksian, Alanna Mitchell, Vybhav Murthy and Eric Rasmussen. These files are kept here for private reference only and must be removed (`docs/source/`) before this repository is made public. The EPFL SCONE handout is by Alice Bruel, Dimitar Stanev, Andrea Di Russo and Auke Ijspeert and is kept only in the companion repository.
+The course material in `docs/source/` belongs to the universities and instructors named above: Carnegie Mellon University (Hartmut Geyer), Georgia Tech (Aaron Young and Greg Sawicki), UCLA (Tyler Clites), the University of Utah (Tommaso Lenzi), Stanford University (Scott Delp and the OpenSim team) and the University of Notre Dame (Edgar Bolivar-Nieto). The CMU project report is by Michael Dermksian, Alanna Mitchell, Vybhav Murthy and Eric Rasmussen. These files are kept here for private reference only. The EPFL SCONE handout is by Alice Bruel, Dimitar Stanev, Andrea Di Russo and Auke Ijspeert and is kept only in the companion repository.
 
 SCONE and its tutorial models are by Thomas Geijtenbeek (Apache-2.0 and GPL-3.0). The Camargo et al. dataset is by Jonathan Camargo, Aditya Ramanathan, Will Flanagan and Aaron Young (CC BY 4.0).
 
