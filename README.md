@@ -204,6 +204,7 @@ Python setup: `uv venv --python 3.12 .venv && source .venv/bin/activate && uv pi
 - [x] Robustness tests and the delay-sensitivity curve
 - [x] Figures from one command, an animation of the drop-foot conditions, report
 - [x] Final README with results and a "what did not work" section
+
 ## Credit
 
 The course material in `docs/source/` belongs to the universities and instructors named above: Carnegie Mellon University (Hartmut Geyer), Georgia Tech (Aaron Young and Greg Sawicki), UCLA (Tyler Clites), the University of Utah (Tommaso Lenzi), Stanford University (Scott Delp and the OpenSim team) and the University of Notre Dame (Edgar Bolivar-Nieto). The CMU project report is by Michael Dermksian, Alanna Mitchell, Vybhav Murthy and Eric Rasmussen. These files are kept here for private reference only. The EPFL SCONE handout is by Alice Bruel, Dimitar Stanev, Andrea Di Russo and Auke Ijspeert and is kept only in the companion repository.
